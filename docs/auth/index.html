@@ -22,8 +22,8 @@
 <script src="/js/medium-zoom.js"></script>
 <script src="/js/dismissable-banner.js"></script>
 <script src="/js/scroll-nav-to-view-in-docs.js"></script><link rel="stylesheet" href="/assets/css/styles.0ffd8a10.css">
-<script src="/assets/js/runtime~main.49a6befc.js" defer="defer"></script>
-<script src="/assets/js/main.33f41417.js" defer="defer"></script>
+<script src="/assets/js/runtime~main.46d36701.js" defer="defer"></script>
+<script src="/assets/js/main.1e13085a.js" defer="defer"></script>
 </head>
 <body class="navigation-with-keyboard">
 <script>!function(){function t(t){document.documentElement.setAttribute("data-theme",t)}var e=function(){try{return new URLSearchParams(window.location.search).get("docusaurus-theme")}catch(t){}}()||function(){try{return localStorage.getItem("theme")}catch(t){}}();t(null!==e?e:"dark")}(),function(){try{const c=new URLSearchParams(window.location.search).entries();for(var[t,e]of c)if(t.startsWith("docusaurus-data-")){var a=t.replace("docusaurus-data-","data-");document.documentElement.setAttribute(a,e)}}catch(t){}}()</script><div id="__docusaurus">
@@ -95,8 +95,11 @@ allows allowing guest access:</p>
 <h2 class="anchor anchorWithStickyNavbar_LWe7" id="sign-in-with-proxy-providers">Sign-In with Proxy Providers<a href="#sign-in-with-proxy-providers" class="hash-link" aria-label="Direct link to Sign-In with Proxy Providers" title="Direct link to Sign-In with Proxy Providers">​</a></h2>
 <p>Some auth providers are so-called &quot;proxy&quot; providers, meaning they&#x27;re meant to be used
 behind an authentication proxy. Examples of these are
-<a href="https://github.com/backstage/backstage/blob/master/contrib/docs/tutorials/aws-alb-aad-oidc-auth.md" target="_blank" rel="noopener noreferrer">AWS ALB</a>, <a href="/docs/auth/cloudflare/provider">Cloudflare Access</a>,
-<a href="/docs/auth/google/gcp-iap-auth">GCP IAP</a>, and <a href="/docs/auth/oauth2-proxy/provider">OAuth2 Proxy</a>.</p>
+<a href="https://github.com/backstage/backstage/blob/master/contrib/docs/tutorials/aws-alb-aad-oidc-auth.md" target="_blank" rel="noopener noreferrer">Amazon Application Load Balancer</a>,
+<a href="/docs/auth/microsoft/easy-auth">Azure EasyAuth</a>,
+<a href="/docs/auth/cloudflare/provider">Cloudflare Access</a>,
+<a href="/docs/auth/google/gcp-iap-auth">Google Identity-Aware Proxy</a>
+and <a href="/docs/auth/oauth2-proxy/provider">OAuth2 Proxy</a>.</p>
 <p>When using a proxy provider, you&#x27;ll end up wanting to use a different sign-in page, as
 there is no need for further user interaction once you&#x27;ve signed in towards the proxy.
 All the sign-in page needs to do is to call the <code>/refresh</code> endpoint of the auth providers
