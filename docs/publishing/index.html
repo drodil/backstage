@@ -22,8 +22,8 @@
 <script src="/js/medium-zoom.js"></script>
 <script src="/js/dismissable-banner.js"></script>
 <script src="/js/scroll-nav-to-view-in-docs.js"></script><link rel="stylesheet" href="/assets/css/styles.e737a141.css">
-<script src="/assets/js/runtime~main.ca06b370.js" defer="defer"></script>
-<script src="/assets/js/main.61163139.js" defer="defer"></script>
+<script src="/assets/js/runtime~main.23d3602c.js" defer="defer"></script>
+<script src="/assets/js/main.2d3b209e.js" defer="defer"></script>
 </head>
 <body class="navigation-with-keyboard">
 <script>!function(){function t(t){document.documentElement.setAttribute("data-theme",t)}var e=function(){try{return new URLSearchParams(window.location.search).get("docusaurus-theme")}catch(t){}}()||function(){try{return localStorage.getItem("theme")}catch(t){}}();t(null!==e?e:"dark")}(),function(){try{const c=new URLSearchParams(window.location.search).entries();for(var[t,e]of c)if(t.startsWith("docusaurus-data-")){var a=t.replace("docusaurus-data-","data-");document.documentElement.setAttribute(a,e)}}catch(t){}}()</script><div id="__docusaurus">
@@ -48,7 +48,7 @@ PR is merged. This is typically done every Tuesday around noon CET.</p>
 <li>Check <a href="https://github.com/backstage/backstage/pulls?q=is%3Aopen+is%3Apr+in%3Atitle+%22Version+Packages+%28next%29%22" target="_blank" rel="noopener noreferrer"><code>Version Packages (next)</code> Pull Request</a>
 <ul>
 <li>Verify the version we are shipping is correct, by looking at the version packages PR title. It should be &quot;Version Packages (next)&quot;</li>
-<li>Check <a href="https://github.com/backstage/backstage/blob/master/.changeset/pre.json" target="_blank" rel="noopener noreferrer"><code>.changeset/pre.json</code></a> if the <code>mode</code> is set to <code>pre</code>. If you encounter <code>mode: &quot;exit&quot;</code> or if it&#x27;s not defined, it indicates a mainline release.</li>
+<li>Check <code>pre.json</code> in <a href="https://github.com/backstage/backstage/blob/master/.changeset" target="_blank" rel="noopener noreferrer">the <code>.changeset</code> folder</a> - it should have <code>&quot;mode&quot;: &quot;pre&quot;</code> near the top. If you encounter <code>&quot;mode&quot;: &quot;exit&quot;</code> or if the file doesn&#x27;t exist, it indicates a mainline release.</li>
 </ul>
 </li>
 <li>Verify that there are no active/unfinished <code>sync_version-packages</code> actions running (<a href="https://github.com/backstage/backstage/actions/workflows/sync_version-packages.yml" target="_blank" rel="noopener noreferrer">https://github.com/backstage/backstage/actions/workflows/sync_version-packages.yml</a>)
