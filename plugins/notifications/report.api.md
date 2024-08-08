@@ -12,6 +12,7 @@ import { FetchApi } from '@backstage/core-plugin-api';
 import { IconComponent } from '@backstage/core-plugin-api';
 import { JSX as JSX_2 } from 'react';
 import { Notification as Notification_2 } from '@backstage/plugin-notifications-common';
+import { NotificationSettings } from '@backstage/plugin-notifications-common';
 import { NotificationSeverity } from '@backstage/plugin-notifications-common';
 import { NotificationStatus } from '@backstage/plugin-notifications-common';
 import { default as React_2 } from 'react';
@@ -46,11 +47,17 @@ export interface NotificationsApi {
     options?: GetNotificationsOptions,
   ): Promise<GetNotificationsResponse>;
   // (undocumented)
+  getNotificationSettings(): Promise<NotificationSettings>;
+  // (undocumented)
   getStatus(): Promise<NotificationStatus>;
   // (undocumented)
   updateNotifications(
     options: UpdateNotificationsOptions,
   ): Promise<Notification_2[]>;
+  // (undocumented)
+  updateNotificationSettings(
+    settings: NotificationSettings,
+  ): Promise<NotificationSettings>;
 }
 
 // @public (undocumented)
@@ -66,11 +73,17 @@ export class NotificationsClient implements NotificationsApi {
     options?: GetNotificationsOptions,
   ): Promise<GetNotificationsResponse>;
   // (undocumented)
+  getNotificationSettings(): Promise<NotificationSettings>;
+  // (undocumented)
   getStatus(): Promise<NotificationStatus>;
   // (undocumented)
   updateNotifications(
     options: UpdateNotificationsOptions,
   ): Promise<Notification_2[]>;
+  // (undocumented)
+  updateNotificationSettings(
+    settings: NotificationSettings,
+  ): Promise<NotificationSettings>;
 }
 
 // @public (undocumented)
@@ -176,6 +189,11 @@ export function useNotificationsApi<T>(
       value: T;
     };
 
+// @public (undocumented)
+export const UserNotificationSettingsCard: (props: {
+  originNames?: Record<string, string>;
+}) => React_2.JSX.Element;
+
 // Warnings were encountered during analysis:
 //
 // src/api/NotificationsApi.d.ts:3:22 - (ae-undocumented) Missing documentation for "notificationsApiRef".
@@ -187,15 +205,20 @@ export function useNotificationsApi<T>(
 // src/api/NotificationsApi.d.ts:30:5 - (ae-undocumented) Missing documentation for "getNotification".
 // src/api/NotificationsApi.d.ts:31:5 - (ae-undocumented) Missing documentation for "getStatus".
 // src/api/NotificationsApi.d.ts:32:5 - (ae-undocumented) Missing documentation for "updateNotifications".
+// src/api/NotificationsApi.d.ts:33:5 - (ae-undocumented) Missing documentation for "getNotificationSettings".
+// src/api/NotificationsApi.d.ts:34:5 - (ae-undocumented) Missing documentation for "updateNotificationSettings".
 // src/api/NotificationsClient.d.ts:5:1 - (ae-undocumented) Missing documentation for "NotificationsClient".
 // src/api/NotificationsClient.d.ts:12:5 - (ae-undocumented) Missing documentation for "getNotifications".
 // src/api/NotificationsClient.d.ts:13:5 - (ae-undocumented) Missing documentation for "getNotification".
 // src/api/NotificationsClient.d.ts:14:5 - (ae-undocumented) Missing documentation for "getStatus".
 // src/api/NotificationsClient.d.ts:15:5 - (ae-undocumented) Missing documentation for "updateNotifications".
+// src/api/NotificationsClient.d.ts:16:5 - (ae-undocumented) Missing documentation for "getNotificationSettings".
+// src/api/NotificationsClient.d.ts:17:5 - (ae-undocumented) Missing documentation for "updateNotificationSettings".
 // src/components/NotificationsPage/NotificationsPage.d.ts:3:1 - (ae-undocumented) Missing documentation for "NotificationsPageProps".
 // src/components/NotificationsSideBarItem/NotificationsSideBarItem.d.ts:12:22 - (ae-undocumented) Missing documentation for "NotificationsSidebarItem".
 // src/components/NotificationsTable/NotificationsTable.d.ts:5:1 - (ae-undocumented) Missing documentation for "NotificationsTableProps".
 // src/components/NotificationsTable/NotificationsTable.d.ts:15:22 - (ae-undocumented) Missing documentation for "NotificationsTable".
+// src/components/UserNotificationSettingsCard/UserNotificationSettingsCard.d.ts:3:22 - (ae-undocumented) Missing documentation for "UserNotificationSettingsCard".
 // src/hooks/useNotificationsApi.d.ts:3:1 - (ae-undocumented) Missing documentation for "useNotificationsApi".
 // src/plugin.d.ts:3:22 - (ae-undocumented) Missing documentation for "notificationsPlugin".
 // src/plugin.d.ts:7:22 - (ae-undocumented) Missing documentation for "NotificationsPage".
