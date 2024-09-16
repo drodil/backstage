@@ -266,7 +266,11 @@ module.exports = {
       'conf/writing',
       'conf/defining',
     ],
-    Notifications: ['notifications/index'],
+    Notifications: [
+      'notifications/index',
+      'notifications/processors',
+      'notifications/usage',
+    ],
     'Auth and identity': [
       'auth/index',
       {
