@@ -18,6 +18,7 @@ import { Config } from '@backstage/config';
 import { DatabaseService } from '@backstage/backend-plugin-api';
 import { DiscoveryService } from '@backstage/backend-plugin-api';
 import { Duration } from 'luxon';
+import { EventsService } from '@backstage/plugin-events-node';
 import { executeShellCommand as executeShellCommand_2 } from '@backstage/plugin-scaffolder-node';
 import { ExecuteShellCommandOptions } from '@backstage/plugin-scaffolder-node';
 import express from 'express';
@@ -499,6 +500,7 @@ export class DatabaseTaskStore implements TaskStore {
 // @public
 export type DatabaseTaskStoreOptions = {
   database: PluginDatabaseManager | Knex;
+  events?: EventsService;
 };
 
 // @public @deprecated
@@ -530,6 +532,8 @@ export interface RouterOptions {
   database: DatabaseService;
   // (undocumented)
   discovery?: DiscoveryService;
+  // (undocumented)
+  events?: EventsService;
   // (undocumented)
   httpAuth?: HttpAuthService;
   // (undocumented)
@@ -871,25 +875,25 @@ export type TemplatePermissionRuleInput<
 // src/scaffolder/actions/deprecated.d.ts:109:22 - (ae-undocumented) Missing documentation for "createPublishGerritReviewAction".
 // src/scaffolder/actions/deprecated.d.ts:114:22 - (ae-undocumented) Missing documentation for "createPublishGitlabAction".
 // src/scaffolder/actions/deprecated.d.ts:119:22 - (ae-undocumented) Missing documentation for "createPublishGitlabMergeRequestAction".
-// src/scaffolder/tasks/DatabaseTaskStore.d.ts:42:5 - (ae-undocumented) Missing documentation for "create".
-// src/scaffolder/tasks/DatabaseTaskStore.d.ts:49:5 - (ae-undocumented) Missing documentation for "list".
-// src/scaffolder/tasks/DatabaseTaskStore.d.ts:68:5 - (ae-undocumented) Missing documentation for "getTask".
-// src/scaffolder/tasks/DatabaseTaskStore.d.ts:69:5 - (ae-undocumented) Missing documentation for "createTask".
-// src/scaffolder/tasks/DatabaseTaskStore.d.ts:70:5 - (ae-undocumented) Missing documentation for "claimTask".
-// src/scaffolder/tasks/DatabaseTaskStore.d.ts:71:5 - (ae-undocumented) Missing documentation for "heartbeatTask".
-// src/scaffolder/tasks/DatabaseTaskStore.d.ts:72:5 - (ae-undocumented) Missing documentation for "listStaleTasks".
-// src/scaffolder/tasks/DatabaseTaskStore.d.ts:80:5 - (ae-undocumented) Missing documentation for "completeTask".
-// src/scaffolder/tasks/DatabaseTaskStore.d.ts:85:5 - (ae-undocumented) Missing documentation for "emitLogEvent".
-// src/scaffolder/tasks/DatabaseTaskStore.d.ts:88:5 - (ae-undocumented) Missing documentation for "getTaskState".
-// src/scaffolder/tasks/DatabaseTaskStore.d.ts:93:5 - (ae-undocumented) Missing documentation for "saveTaskState".
-// src/scaffolder/tasks/DatabaseTaskStore.d.ts:97:5 - (ae-undocumented) Missing documentation for "listEvents".
-// src/scaffolder/tasks/DatabaseTaskStore.d.ts:100:5 - (ae-undocumented) Missing documentation for "shutdownTask".
-// src/scaffolder/tasks/DatabaseTaskStore.d.ts:101:5 - (ae-undocumented) Missing documentation for "rehydrateWorkspace".
-// src/scaffolder/tasks/DatabaseTaskStore.d.ts:105:5 - (ae-undocumented) Missing documentation for "cleanWorkspace".
-// src/scaffolder/tasks/DatabaseTaskStore.d.ts:108:5 - (ae-undocumented) Missing documentation for "serializeWorkspace".
-// src/scaffolder/tasks/DatabaseTaskStore.d.ts:112:5 - (ae-undocumented) Missing documentation for "cancelTask".
-// src/scaffolder/tasks/DatabaseTaskStore.d.ts:115:5 - (ae-undocumented) Missing documentation for "retryTask".
-// src/scaffolder/tasks/DatabaseTaskStore.d.ts:118:5 - (ae-undocumented) Missing documentation for "recoverTasks".
+// src/scaffolder/tasks/DatabaseTaskStore.d.ts:45:5 - (ae-undocumented) Missing documentation for "create".
+// src/scaffolder/tasks/DatabaseTaskStore.d.ts:53:5 - (ae-undocumented) Missing documentation for "list".
+// src/scaffolder/tasks/DatabaseTaskStore.d.ts:72:5 - (ae-undocumented) Missing documentation for "getTask".
+// src/scaffolder/tasks/DatabaseTaskStore.d.ts:73:5 - (ae-undocumented) Missing documentation for "createTask".
+// src/scaffolder/tasks/DatabaseTaskStore.d.ts:74:5 - (ae-undocumented) Missing documentation for "claimTask".
+// src/scaffolder/tasks/DatabaseTaskStore.d.ts:75:5 - (ae-undocumented) Missing documentation for "heartbeatTask".
+// src/scaffolder/tasks/DatabaseTaskStore.d.ts:76:5 - (ae-undocumented) Missing documentation for "listStaleTasks".
+// src/scaffolder/tasks/DatabaseTaskStore.d.ts:84:5 - (ae-undocumented) Missing documentation for "completeTask".
+// src/scaffolder/tasks/DatabaseTaskStore.d.ts:89:5 - (ae-undocumented) Missing documentation for "emitLogEvent".
+// src/scaffolder/tasks/DatabaseTaskStore.d.ts:92:5 - (ae-undocumented) Missing documentation for "getTaskState".
+// src/scaffolder/tasks/DatabaseTaskStore.d.ts:97:5 - (ae-undocumented) Missing documentation for "saveTaskState".
+// src/scaffolder/tasks/DatabaseTaskStore.d.ts:101:5 - (ae-undocumented) Missing documentation for "listEvents".
+// src/scaffolder/tasks/DatabaseTaskStore.d.ts:104:5 - (ae-undocumented) Missing documentation for "shutdownTask".
+// src/scaffolder/tasks/DatabaseTaskStore.d.ts:105:5 - (ae-undocumented) Missing documentation for "rehydrateWorkspace".
+// src/scaffolder/tasks/DatabaseTaskStore.d.ts:109:5 - (ae-undocumented) Missing documentation for "cleanWorkspace".
+// src/scaffolder/tasks/DatabaseTaskStore.d.ts:112:5 - (ae-undocumented) Missing documentation for "serializeWorkspace".
+// src/scaffolder/tasks/DatabaseTaskStore.d.ts:116:5 - (ae-undocumented) Missing documentation for "cancelTask".
+// src/scaffolder/tasks/DatabaseTaskStore.d.ts:119:5 - (ae-undocumented) Missing documentation for "retryTask".
+// src/scaffolder/tasks/DatabaseTaskStore.d.ts:122:5 - (ae-undocumented) Missing documentation for "recoverTasks".
 // src/scaffolder/tasks/StorageTaskBroker.d.ts:25:5 - (ae-undocumented) Missing documentation for "create".
 // src/scaffolder/tasks/StorageTaskBroker.d.ts:27:5 - (ae-undocumented) Missing documentation for "spec".
 // src/scaffolder/tasks/StorageTaskBroker.d.ts:28:5 - (ae-undocumented) Missing documentation for "cancelSignal".
@@ -930,26 +934,27 @@ export type TemplatePermissionRuleInput<
 // src/scaffolder/tasks/types.d.ts:200:5 - (ae-undocumented) Missing documentation for "rehydrateWorkspace".
 // src/scaffolder/tasks/types.d.ts:204:5 - (ae-undocumented) Missing documentation for "cleanWorkspace".
 // src/scaffolder/tasks/types.d.ts:207:5 - (ae-undocumented) Missing documentation for "serializeWorkspace".
-// src/service/router.d.ts:17:1 - (ae-undocumented) Missing documentation for "TemplatePermissionRuleInput".
-// src/service/router.d.ts:22:1 - (ae-undocumented) Missing documentation for "ActionPermissionRuleInput".
-// src/service/router.d.ts:30:5 - (ae-undocumented) Missing documentation for "logger".
-// src/service/router.d.ts:31:5 - (ae-undocumented) Missing documentation for "config".
-// src/service/router.d.ts:32:5 - (ae-undocumented) Missing documentation for "reader".
-// src/service/router.d.ts:33:5 - (ae-undocumented) Missing documentation for "lifecycle".
-// src/service/router.d.ts:34:5 - (ae-undocumented) Missing documentation for "database".
-// src/service/router.d.ts:35:5 - (ae-undocumented) Missing documentation for "catalogClient".
-// src/service/router.d.ts:36:5 - (ae-undocumented) Missing documentation for "scheduler".
-// src/service/router.d.ts:37:5 - (ae-undocumented) Missing documentation for "actions".
-// src/service/router.d.ts:42:5 - (ae-undocumented) Missing documentation for "taskWorkers".
-// src/service/router.d.ts:48:5 - (ae-undocumented) Missing documentation for "taskBroker".
-// src/service/router.d.ts:49:5 - (ae-undocumented) Missing documentation for "additionalTemplateFilters".
-// src/service/router.d.ts:50:5 - (ae-undocumented) Missing documentation for "additionalTemplateGlobals".
-// src/service/router.d.ts:51:5 - (ae-undocumented) Missing documentation for "additionalWorkspaceProviders".
-// src/service/router.d.ts:52:5 - (ae-undocumented) Missing documentation for "permissions".
-// src/service/router.d.ts:53:5 - (ae-undocumented) Missing documentation for "permissionRules".
-// src/service/router.d.ts:54:5 - (ae-undocumented) Missing documentation for "auth".
-// src/service/router.d.ts:55:5 - (ae-undocumented) Missing documentation for "httpAuth".
-// src/service/router.d.ts:56:5 - (ae-undocumented) Missing documentation for "identity".
-// src/service/router.d.ts:57:5 - (ae-undocumented) Missing documentation for "discovery".
-// src/service/router.d.ts:58:5 - (ae-undocumented) Missing documentation for "autocompleteHandlers".
+// src/service/router.d.ts:18:1 - (ae-undocumented) Missing documentation for "TemplatePermissionRuleInput".
+// src/service/router.d.ts:23:1 - (ae-undocumented) Missing documentation for "ActionPermissionRuleInput".
+// src/service/router.d.ts:31:5 - (ae-undocumented) Missing documentation for "logger".
+// src/service/router.d.ts:32:5 - (ae-undocumented) Missing documentation for "config".
+// src/service/router.d.ts:33:5 - (ae-undocumented) Missing documentation for "reader".
+// src/service/router.d.ts:34:5 - (ae-undocumented) Missing documentation for "lifecycle".
+// src/service/router.d.ts:35:5 - (ae-undocumented) Missing documentation for "database".
+// src/service/router.d.ts:36:5 - (ae-undocumented) Missing documentation for "catalogClient".
+// src/service/router.d.ts:37:5 - (ae-undocumented) Missing documentation for "scheduler".
+// src/service/router.d.ts:38:5 - (ae-undocumented) Missing documentation for "actions".
+// src/service/router.d.ts:43:5 - (ae-undocumented) Missing documentation for "taskWorkers".
+// src/service/router.d.ts:49:5 - (ae-undocumented) Missing documentation for "taskBroker".
+// src/service/router.d.ts:50:5 - (ae-undocumented) Missing documentation for "additionalTemplateFilters".
+// src/service/router.d.ts:51:5 - (ae-undocumented) Missing documentation for "additionalTemplateGlobals".
+// src/service/router.d.ts:52:5 - (ae-undocumented) Missing documentation for "additionalWorkspaceProviders".
+// src/service/router.d.ts:53:5 - (ae-undocumented) Missing documentation for "permissions".
+// src/service/router.d.ts:54:5 - (ae-undocumented) Missing documentation for "permissionRules".
+// src/service/router.d.ts:55:5 - (ae-undocumented) Missing documentation for "auth".
+// src/service/router.d.ts:56:5 - (ae-undocumented) Missing documentation for "httpAuth".
+// src/service/router.d.ts:57:5 - (ae-undocumented) Missing documentation for "identity".
+// src/service/router.d.ts:58:5 - (ae-undocumented) Missing documentation for "discovery".
+// src/service/router.d.ts:59:5 - (ae-undocumented) Missing documentation for "events".
+// src/service/router.d.ts:60:5 - (ae-undocumented) Missing documentation for "autocompleteHandlers".
 ```
