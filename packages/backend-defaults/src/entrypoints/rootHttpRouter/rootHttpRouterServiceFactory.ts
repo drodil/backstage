@@ -88,9 +88,6 @@ const rootHttpRouterServiceFactoryWithOptions = (
       const trustProxy = config.getOptional<boolean | number>(
         'backend.trustProxy',
       );
-      if (trustProxy) {
-        app.set('trust proxy', trustProxy);
-      }
 
       const router = DefaultRootHttpRouter.create({ indexPath });
       const middleware = MiddlewareFactory.create({ config, logger });
@@ -113,6 +110,9 @@ const rootHttpRouterServiceFactoryWithOptions = (
         lifecycle,
         healthRouter,
         applyDefaults() {
+          if (trustProxy) {
+            app.set('trust proxy', trustProxy);
+          }
           app.use(middleware.rateLimit());
           app.use(middleware.helmet());
           app.use(middleware.cors());
