@@ -792,6 +792,22 @@ export interface Config {
                 connection: string;
               }
             | {
+                client: 'postgres';
+                connection:
+                  | string
+                  | {
+                      /**
+                       * @visibility secret
+                       */
+                      password?: string;
+                      /**
+                       * Other connection settings
+                       * @see https://node-postgres.com/apis/client
+                       */
+                      [key: string]: unknown;
+                    };
+              }
+            | {
                 client: 'memory';
               };
           /**
