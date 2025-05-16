@@ -136,7 +136,7 @@ export type PermissionClientOptions = {
   batchDelay?: number;
 };
 
-const MAX_BATCH_SIZE = 200;
+const MAX_BATCH_SIZE = 50;
 const DEFAULT_LOADER_CACHE_TTL = durationToMilliseconds({ minutes: 10 });
 const DEFAULT_CACHE_TTL = durationToMilliseconds({ seconds: 10 });
 const DEFAULT_BATCH_DELAY = durationToMilliseconds({ milliseconds: 20 });
