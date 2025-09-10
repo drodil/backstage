@@ -53,6 +53,8 @@ import { EntityFilter } from '@backstage/plugin-catalog-node';
 import { LoggerService } from '@backstage/backend-plugin-api';
 import { applyEntityFilterToQuery } from './request/applyEntityFilterToQuery';
 import { processRawEntitiesResult } from './response';
+import QueryStream from 'pg-query-stream';
+import { PgPoolAdapter } from 'pg-pool-adapter';
 
 const DEFAULT_LIMIT = 200;
 
@@ -121,7 +123,10 @@ export class DefaultEntitiesCatalog implements EntitiesCatalog {
     );
   }
 
-  async entities(request?: EntitiesRequest): Promise<EntitiesResponse> {
+  private getEntitiesBaseQuery(
+    request?: EntitiesRequest,
+    fetchExtraRow = false,
+  ) {
     const db = this.database;
     const { limit, offset } = parsePagination(request?.pagination);
 
@@ -175,11 +180,17 @@ export class DefaultEntitiesCatalog implements EntitiesCatalog {
     }
 
     if (limit !== undefined) {
-      entitiesQuery = entitiesQuery.limit(limit + 1);
+      entitiesQuery = entitiesQuery.limit(fetchExtraRow ? limit + 1 : limit);
     }
     if (offset !== undefined) {
       entitiesQuery = entitiesQuery.offset(offset);
     }
+    return entitiesQuery;
+  }
+
+  async entities(request?: EntitiesRequest): Promise<EntitiesResponse> {
+    const entitiesQuery = this.getEntitiesBaseQuery(request, true);
+    const { limit, offset } = parsePagination(request?.pagination);
 
     let rows = await entitiesQuery;
     let pageInfo: DbPageInfo;
@@ -243,6 +254,32 @@ export class DefaultEntitiesCatalog implements EntitiesCatalog {
     const items = request.entityRefs.map(ref => lookup.get(ref) ?? null);
 
     return { items: processRawEntitiesResult(items, request.fields) };
+  }
+
+  async *streamEntities(request: EntitiesRequest): AsyncIterable<Entity> {
+    const entitiesQuery = this.getEntitiesBaseQuery(request);
+    if (this.database.client.config.client === 'pg') {
+      const pool = PgPoolAdapter.fromKnex(this.database);
+      const client = await pool.connect();
+      const { sql, bindings } = entitiesQuery.toSQL().toNative();
+      const stream = new QueryStream(sql, [...bindings]);
+      stream.on('end', () => client.release());
+      const pgStream = client.query(stream);
+      for await (const row of pgStream) {
+        if (!row?.final_entity) {
+          continue;
+        }
+        yield JSON.parse(row.final_entity);
+      }
+    } else {
+      const rows = await entitiesQuery;
+      for (const row of rows) {
+        if (!row?.final_entity) {
+          continue;
+        }
+        yield JSON.parse(row.final_entity);
+      }
+    }
   }
 
   async queryEntities(

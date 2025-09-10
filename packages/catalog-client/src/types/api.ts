@@ -709,8 +709,7 @@ export interface CatalogApi {
   ): Promise<AnalyzeLocationResponse>;
 
   /**
-   * Asynchronously streams entities from the catalog. Uses `queryEntities`
-   * to fetch entities in batches, and yields them one page at a time.
+   * Asynchronously streams entities from the catalog.
    *
    * @public
    *
@@ -718,7 +717,7 @@ export interface CatalogApi {
    * @param options - Additional options
    */
   streamEntities(
-    request?: StreamEntitiesRequest,
+    request?: GetEntitiesRequest,
     options?: CatalogRequestOptions,
-  ): AsyncIterable<Entity[]>;
+  ): AsyncIterable<Entity>;
 }

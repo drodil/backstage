@@ -32,7 +32,6 @@ import {
   Location,
   QueryEntitiesRequest,
   QueryEntitiesResponse,
-  StreamEntitiesRequest,
   ValidateEntityResponse,
 } from '@backstage/catalog-client';
 import {
@@ -49,7 +48,6 @@ import type {
   AnalyzeLocationRequest,
   AnalyzeLocationResponse,
 } from '@backstage/plugin-catalog-common';
-import { DEFAULT_STREAM_ENTITIES_LIMIT } from '../constants.ts';
 
 function buildEntitySearch(entity: Entity) {
   const rows = traverse(entity);
@@ -281,20 +279,10 @@ export class InMemoryCatalogClient implements CatalogApi {
     throw new NotImplementedError('Method not implemented.');
   }
 
-  async *streamEntities(
-    request?: StreamEntitiesRequest,
-  ): AsyncIterable<Entity[]> {
-    let cursor: string | undefined = undefined;
-    const limit = request?.pageSize ?? DEFAULT_STREAM_ENTITIES_LIMIT;
-    do {
-      const res = await this.queryEntities(
-        cursor ? { ...request, limit, cursor } : { ...request, limit },
-      );
-
-      yield res.items;
-
-      cursor = res.pageInfo.nextCursor;
-    } while (cursor);
+  async *streamEntities(_request?: GetEntitiesRequest): AsyncIterable<Entity> {
+    for (const entity of this.#entities) {
+      yield entity;
+    }
   }
 
   #createEntityRefMap() {

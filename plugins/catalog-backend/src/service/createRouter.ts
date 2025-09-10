@@ -62,6 +62,7 @@ import {
   locationInput,
   validateRequestBody,
 } from './util';
+import { Generator } from 'json-text-sequence';
 
 /**
  * Options used by {@link createRouter}.
@@ -256,6 +257,34 @@ export async function createRouter(
           });
           throw err;
         }
+      })
+      .get('/entities/stream', async (req, res) => {
+        const filter = parseEntityFilterParams(req.query);
+        const fields = parseEntityTransformParams(req.query);
+        const order = parseEntityOrderParams(req.query);
+        const pagination = parseEntityPaginationParams(req.query);
+        const credentials = await httpAuth.credentials(req);
+
+        // Use JSON Text Sequences (RFC 7464) as the media type
+        // https://tools.ietf.org/html/rfc7464
+        // This is similar to ndjson, but uses ASCII record separator (0x1E) instead of new line
+        res.writeHead(200, {
+          'Content-Type': 'application/json-seq',
+        });
+        const entities = entitiesCatalog.streamEntities({
+          filter,
+          fields,
+          order,
+          pagination,
+          credentials,
+        });
+
+        const generator = new Generator();
+        generator.pipe(res);
+        for await (const entity of entities) {
+          generator.write(entity);
+        }
+        res.end();
       })
       .get('/entities/by-query', async (req, res) => {
         const auditorEvent = await auditor?.createEvent({

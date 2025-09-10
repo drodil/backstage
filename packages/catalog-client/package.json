@@ -48,14 +48,17 @@
     "test": "backstage-cli package test"
   },
   "dependencies": {
+    "@apidevtools/swagger-parser": "^10.1.0",
     "@backstage/catalog-model": "workspace:^",
     "@backstage/errors": "workspace:^",
     "cross-fetch": "^4.0.0",
+    "json-text-sequence": "^4.0.2",
     "uri-template": "^2.0.0"
   },
   "devDependencies": {
     "@backstage/cli": "workspace:^",
     "@backstage/plugin-catalog-common": "workspace:^",
-    "msw": "^1.0.0"
+    "jest-fixed-jsdom": "^0.0.10",
+    "msw": "^2.2.14"
   }
 }

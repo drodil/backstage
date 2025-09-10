@@ -39,7 +39,6 @@ import {
   Location,
   QueryEntitiesRequest,
   QueryEntitiesResponse,
-  StreamEntitiesRequest,
   ValidateEntityResponse,
 } from '@backstage/catalog-client';
 import { CompoundEntityRef, Entity } from '@backstage/catalog-model';
@@ -144,9 +143,9 @@ export interface CatalogService {
   ): Promise<AnalyzeLocationResponse>;
 
   streamEntities(
-    request: StreamEntitiesRequest | undefined,
+    request: GetEntitiesRequest | undefined,
     options: CatalogServiceRequestOptions,
-  ): AsyncIterable<Entity[]>;
+  ): AsyncIterable<Entity>;
 }
 
 class DefaultCatalogService implements CatalogService {
@@ -327,9 +326,9 @@ class DefaultCatalogService implements CatalogService {
   }
 
   async *streamEntities(
-    request: StreamEntitiesRequest | undefined,
+    request: GetEntitiesRequest | undefined,
     options: CatalogServiceRequestOptions,
-  ): AsyncIterable<Entity[]> {
+  ): AsyncIterable<Entity> {
     yield* this.#catalogApi.streamEntities(
       request,
       await this.#getOptions(options),

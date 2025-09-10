@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 The Backstage Authors
+ * Copyright 2025 The Backstage Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -853,6 +853,66 @@ export const spec = {
                   items: {
                     $ref: '#/components/schemas/Entity',
                   },
+                },
+              },
+            },
+          },
+          '400': {
+            $ref: '#/components/responses/ErrorResponse',
+          },
+          default: {
+            $ref: '#/components/responses/ErrorResponse',
+          },
+        },
+        security: [
+          {},
+          {
+            JWT: [],
+          },
+        ],
+        parameters: [
+          {
+            $ref: '#/components/parameters/fields',
+          },
+          {
+            $ref: '#/components/parameters/limit',
+          },
+          {
+            $ref: '#/components/parameters/filter',
+          },
+          {
+            $ref: '#/components/parameters/offset',
+          },
+          {
+            $ref: '#/components/parameters/after',
+          },
+          {
+            name: 'order',
+            in: 'query',
+            allowReserved: true,
+            required: false,
+            schema: {
+              type: 'array',
+              items: {
+                type: 'string',
+              },
+            },
+          },
+        ],
+      },
+    },
+    '/entities/stream': {
+      get: {
+        operationId: 'StreamEntities',
+        tags: ['Entity'],
+        description: 'Stream entities matching a given filter.',
+        responses: {
+          '200': {
+            description: '',
+            content: {
+              'application/json-seq': {
+                schema: {
+                  $ref: '#/components/schemas/Entity',
                 },
               },
             },

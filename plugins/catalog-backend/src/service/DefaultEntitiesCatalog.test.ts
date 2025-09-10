@@ -15,15 +15,16 @@
  */
 
 import {
-  TestDatabaseId,
-  TestDatabases,
   mockCredentials,
   mockServices,
+  TestDatabaseId,
+  TestDatabases,
 } from '@backstage/backend-test-utils';
 import { Entity, stringifyEntityRef } from '@backstage/catalog-model';
 import { Knex } from 'knex';
 import { v4 as uuid, v4 } from 'uuid';
 import {
+  EntitiesRequest,
   QueryEntitiesCursorRequest,
   QueryEntitiesInitialRequest,
 } from '../catalog/types';
@@ -36,7 +37,6 @@ import {
 } from '../database/tables';
 import { Stitcher } from '../stitching/types';
 import { DefaultEntitiesCatalog } from './DefaultEntitiesCatalog';
-import { EntitiesRequest } from '../catalog/types';
 import { buildEntitySearch } from '../database/operations/stitcher/buildEntitySearch';
 import { entitiesResponseToObjects } from './response';
 
@@ -49,7 +49,7 @@ describe('DefaultEntitiesCatalog', () => {
     await knex.destroy();
   });
 
-  const databases = TestDatabases.create();
+  const databases = TestDatabases.create({ ids: ['POSTGRES_17', 'SQLITE_3'] });
   const stitch = jest.fn();
   const stitcher: Stitcher = { stitch } as any;
 
@@ -845,6 +845,58 @@ describe('DefaultEntitiesCatalog', () => {
           'k:default/two',
           null,
         ]);
+      },
+    );
+  });
+
+  describe('streamEntities', () => {
+    it.each(databases.eachSupportedId())(
+      'should stream entities, %p',
+      async databaseId => {
+        await createDatabase(databaseId);
+
+        const names = ['B', 'F', 'A', 'G', 'D', 'C', 'E'];
+        const entities: Entity[] = names.map(name => entityFrom(name));
+
+        const notFoundEntities: Entity[] = [
+          {
+            apiVersion: 'a',
+            kind: 'k',
+            metadata: { name: 'something' },
+            spec: {},
+          },
+          {
+            apiVersion: 'a',
+            kind: 'k',
+            metadata: { name: 'something else' },
+            spec: {},
+          },
+        ];
+
+        await Promise.all(
+          entities.concat(notFoundEntities).map(e => addEntityToSearch(e)),
+        );
+
+        const catalog = new DefaultEntitiesCatalog({
+          database: knex,
+          logger: mockServices.logger.mock(),
+          stitcher,
+        });
+
+        const limit = 2;
+
+        const request1: EntitiesRequest = {
+          pagination: { limit },
+          credentials: mockCredentials.none(),
+        };
+
+        const stream = await catalog.streamEntities(request1);
+        const received: Entity[] = [];
+        for await (const entity of stream) {
+          received.push(entity);
+        }
+        expect(received.length).toEqual(limit);
+        expect(received).toEqual([entityFrom('A'), entityFrom('B')]);
       },
     );
   });

@@ -14,4 +14,6 @@
  * limitations under the License.
  */
 
+import 'jest-fixed-jsdom';
+
 export {};

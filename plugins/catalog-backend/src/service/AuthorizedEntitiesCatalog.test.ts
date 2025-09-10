@@ -31,6 +31,7 @@ describe('AuthorizedEntitiesCatalog', () => {
     entitiesBatch: jest.fn(),
     removeEntityByUid: jest.fn(),
     entityAncestry: jest.fn(),
+    streamEntities: jest.fn(),
     facets: jest.fn(),
     refresh: jest.fn(),
     listAncestors: jest.fn(),

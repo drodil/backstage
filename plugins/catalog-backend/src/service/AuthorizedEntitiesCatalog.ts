@@ -114,6 +114,34 @@ export class AuthorizedEntitiesCatalog implements EntitiesCatalog {
     return this.entitiesCatalog.entitiesBatch(request);
   }
 
+  async *streamEntities(request: EntitiesRequest): AsyncIterable<Entity> {
+    const authorizeDecision = (
+      await this.permissionApi.authorizeConditional(
+        [{ permission: catalogEntityReadPermission }],
+        { credentials: request.credentials },
+      )
+    )[0];
+
+    if (authorizeDecision.result === AuthorizeResult.DENY) {
+      return;
+    }
+
+    if (authorizeDecision.result === AuthorizeResult.CONDITIONAL) {
+      const permissionFilter: EntityFilter = this.transformConditions(
+        authorizeDecision.conditions,
+      );
+      yield* this.entitiesCatalog.streamEntities({
+        ...request,
+        filter: request?.filter
+          ? { allOf: [permissionFilter, request.filter] }
+          : permissionFilter,
+      });
+      return;
+    }
+
+    yield* this.entitiesCatalog.streamEntities(request);
+  }
+
   async queryEntities(
     request: QueryEntitiesRequest,
   ): Promise<QueryEntitiesResponse> {

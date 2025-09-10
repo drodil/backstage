@@ -192,6 +192,13 @@ export interface EntitiesCatalog {
    * @param request - Request options
    */
   facets(request: EntityFacetsRequest): Promise<EntityFacetsResponse>;
+
+  /**
+   * Streams entities one by one
+   *
+   * @param request - Request options
+   */
+  streamEntities(request?: EntitiesRequest): AsyncIterable<Entity>;
 }
 
 /**

@@ -40,7 +40,6 @@ import {
   Location,
   QueryEntitiesRequest,
   QueryEntitiesResponse,
-  StreamEntitiesRequest,
   ValidateEntityResponse,
 } from './types/api';
 import { isQueryEntitiesInitialRequest, splitRefsIntoChunks } from './utils';
@@ -49,7 +48,9 @@ import type {
   AnalyzeLocationRequest,
   AnalyzeLocationResponse,
 } from '@backstage/plugin-catalog-common';
-import { DEFAULT_STREAM_ENTITIES_LIMIT } from './constants.ts';
+import { pluginId } from './schema/openapi/generated/pluginId.ts';
+import * as parser from 'uri-template';
+import crossFetch from 'cross-fetch';
 
 /**
  * A frontend and backend compatible client for communicating with the Backstage
@@ -59,12 +60,16 @@ import { DEFAULT_STREAM_ENTITIES_LIMIT } from './constants.ts';
  */
 export class CatalogClient implements CatalogApi {
   private readonly apiClient: DefaultApiClient;
+  private readonly discoveryApi;
+  private readonly fetchApi;
 
   constructor(options: {
     discoveryApi: { getBaseUrl(pluginId: string): Promise<string> };
     fetchApi?: { fetch: typeof fetch };
   }) {
     this.apiClient = new DefaultApiClient(options);
+    this.discoveryApi = options.discoveryApi;
+    this.fetchApi = options.fetchApi || { fetch: crossFetch };
   }
 
   /**
@@ -462,21 +467,61 @@ export class CatalogClient implements CatalogApi {
    * {@inheritdoc CatalogApi.streamEntities}
    */
   async *streamEntities(
-    request?: StreamEntitiesRequest,
+    request?: GetEntitiesRequest,
     options?: CatalogRequestOptions,
-  ): AsyncIterable<Entity[]> {
-    let cursor: string | undefined = undefined;
-    const limit = request?.pageSize ?? DEFAULT_STREAM_ENTITIES_LIMIT;
-    do {
-      const res = await this.queryEntities(
-        cursor ? { ...request, cursor, limit } : { ...request, limit },
-        options,
-      );
+  ): AsyncIterable<Entity> {
+    const {
+      filter = [],
+      fields = [],
+      order,
+      offset,
+      limit,
+      after,
+    } = request ?? {};
+    const encodedOrder = [];
+    if (order) {
+      for (const directive of [order].flat()) {
+        if (directive) {
+          encodedOrder.push(`${directive.order}:${directive.field}`);
+        }
+      }
+    }
 
-      yield res.items;
+    // TODO: Streaming endpoints support coming in OpenAPI spec 3.2.0
+    //       https://github.com/OAI/OpenAPI-Specification/pull/4554
+    //       Requires also swagger-generator to support that to be able
+    //       to use the generated client.
+    const baseUrl = await this.discoveryApi.getBaseUrl(pluginId);
+    const uriTemplate = `/entities/stream{?fields,limit,filter*,offset,after,order*}`;
+    const uri = parser.parse(uriTemplate).expand({
+      filter,
+      fields,
+      order,
+      offset,
+      limit,
+      after,
+      encodedOrder,
+    });
 
-      cursor = res.pageInfo.nextCursor;
-    } while (cursor);
+    const resp = await this.fetchApi.fetch(`${baseUrl}${uri}`, {
+      headers: {
+        'Content-Type': 'application/json',
+        ...(options?.token && { Authorization: `Bearer ${options?.token}` }),
+      },
+      method: 'GET',
+    });
+
+    if (!resp.body) {
+      throw new Error(`No response body`);
+    }
+
+    const reader = resp.body.pipeThrough(new TextDecoderStream()).getReader();
+
+    while (true) {
+      const { value, done } = await reader.read();
+      if (done) break;
+      yield JSON.parse(value) as unknown as Entity;
+    }
   }
 
   //

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 The Backstage Authors
+ * Copyright 2025 The Backstage Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -129,6 +129,20 @@ export type RefreshEntity = {
 /**
  * @public
  */
+export type StreamEntities = {
+  query: {
+    fields?: Array<string>;
+    limit?: number;
+    filter?: Array<string>;
+    offset?: number;
+    after?: string;
+    order?: Array<string>;
+  };
+  response: Entity | Error | Error;
+};
+/**
+ * @public
+ */
 export type ValidateEntity = {
   body: ValidateEntityRequest;
   response: void | ValidateEntity400Response;
@@ -211,6 +225,8 @@ export type EndpointMap = {
   '#get|/entity-facets': GetEntityFacets;
 
   '#post|/refresh': RefreshEntity;
+
+  '#get|/entities/stream': StreamEntities;
 
   '#post|/validate-entity': ValidateEntity;
 
