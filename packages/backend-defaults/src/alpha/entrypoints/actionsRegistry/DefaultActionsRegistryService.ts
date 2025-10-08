@@ -69,6 +69,7 @@ export class DefaultActionsRegistryService implements ActionsRegistryService {
     const authorizeAction = async (
       actionId: string,
       credentials: BackstageCredentials,
+      input?: AnyZodObject,
     ) => {
       const action = this.actions.get(actionId);
       if (!action) {
@@ -79,7 +80,7 @@ export class DefaultActionsRegistryService implements ActionsRegistryService {
       }
 
       try {
-        const decision = await action.authorize({ credentials });
+        const decision = await action.authorize({ credentials, input });
         return decision.result === AuthorizeResult.ALLOW;
       } catch (err) {
         this.logger.error(`Failed to authorize action ${actionId}`, err);
@@ -149,13 +150,6 @@ export class DefaultActionsRegistryService implements ActionsRegistryService {
           throw new NotFoundError(`Action "${req.params.actionId}" not found`);
         }
 
-        const allowed = await authorizeAction(req.params.actionId, credentials);
-        if (!allowed) {
-          throw new NotAllowedError(
-            `You are not authorized to invoke action "${req.params.actionId}"`,
-          );
-        }
-
         const input = action.schema?.input
           ? action.schema.input(z).safeParse(req.body)
           : ({ success: true, data: undefined } as const);
@@ -164,6 +158,17 @@ export class DefaultActionsRegistryService implements ActionsRegistryService {
           throw new InputError(
             `Invalid input to action "${req.params.actionId}"`,
             input.error,
+          );
+        }
+
+        const allowed = await authorizeAction(
+          req.params.actionId,
+          credentials,
+          input,
+        );
+        if (!allowed) {
+          throw new NotAllowedError(
+            `You are not authorized to invoke action "${req.params.actionId}"`,
           );
         }
 
