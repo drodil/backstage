@@ -24,6 +24,11 @@
       "name": "plugin-analytics-instrumentation",
       "description": "Instrument a Backstage frontend plugin with analytics events using the Backstage Analytics API. Use this skill when adding, reviewing, or extending event capture (captureEvent, AnalyticsContext) in plugin components, deciding whether an interaction warrants an event, or writing tests for analytics behavior.",
       "files": ["SKILL.md"]
+    },
+    {
+      "name": "create-actions-registry-action",
+      "description": "Create new actions and register them with the Backstage ActionsRegistryService. Use this skill when adding new agentic actions to a backend plugin, making backend capabilities callable by agents (via the MCP backend) or usable in scaffolder templates, or when you need to expose plugin functionality as structured, schema-validated actions.",
+      "files": ["SKILL.md"]
     }
   ]
 }
