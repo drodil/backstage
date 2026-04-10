@@ -277,12 +277,12 @@ export const TemplateBackstageLogoIcon: () => JSX_2.Element;
 export type Tool = {
   label: string;
   url: string;
-  icon: ReactNode;
+  icon: ReactNode | string;
 };
 
 // @public
 export type ToolkitContentProps = {
-  tools: Tool[];
+  tools?: Tool[];
 };
 
 // @public

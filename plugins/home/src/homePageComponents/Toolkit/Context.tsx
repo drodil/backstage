@@ -20,7 +20,7 @@ import { ReactNode, useState, useContext, createContext } from 'react';
 export type Tool = {
   label: string;
   url: string;
-  icon: ReactNode;
+  icon: ReactNode | string;
 };
 
 type ToolkitContextValue = {

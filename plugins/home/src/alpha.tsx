@@ -140,15 +140,6 @@ const homePageToolkitWidget = HomePageWidgetBlueprint.make({
         Content: m.Content,
         ContextProvider: m.ContextProvider,
       })),
-    componentProps: {
-      tools: [
-        {
-          url: 'https://backstage.io',
-          label: 'Backstage Docs',
-          icon: <HomeIcon />,
-        },
-      ],
-    },
   },
 });
 

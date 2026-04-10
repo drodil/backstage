@@ -14,7 +14,10 @@
  * limitations under the License.
  */
 
+import { ReactNode } from 'react';
 import { Link } from '@backstage/core-components';
+import { configApiRef, useApi, useApiHolder } from '@backstage/core-plugin-api';
+import { iconsApiRef } from '@backstage/frontend-plugin-api';
 import List from '@material-ui/core/List';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
@@ -57,13 +60,44 @@ const useStyles = makeStyles(theme => ({
 export const Content = (props: ToolkitContentProps) => {
   const classes = useStyles();
   const toolkit = useToolkit();
-  const tools = toolkit?.tools ?? props.tools;
+  const configApi = useApi(configApiRef);
+  const iconsApi = useApiHolder().get(iconsApiRef);
+
+  const configTools: Tool[] = (
+    configApi.getOptionalConfigArray('home.toolkit.tools') ?? []
+  ).map(toolConfig => ({
+    url: toolConfig.getString('url'),
+    label: toolConfig.getString('label'),
+    icon: toolConfig.getOptionalString('icon'),
+  }));
+
+  const seenUrls = new Set<string>();
+  const tools = [
+    ...(toolkit?.tools ?? []),
+    ...(props.tools ?? []),
+    ...configTools,
+  ].filter(tool => {
+    if (seenUrls.has(tool.url)) {
+      return false;
+    }
+    seenUrls.add(tool.url);
+    return true;
+  });
+
+  const resolveIcon = (icon: ReactNode | string): ReactNode => {
+    if (typeof icon === 'string') {
+      return iconsApi?.icon(icon) ?? null;
+    }
+    return icon;
+  };
 
   return (
     <List className={classes.toolkit}>
       {tools.map((tool: Tool) => (
         <Link key={tool.url} to={tool.url} className={classes.tool}>
-          <ListItemIcon className={classes.icon}>{tool.icon}</ListItemIcon>
+          <ListItemIcon className={classes.icon}>
+            {resolveIcon(tool.icon)}
+          </ListItemIcon>
           <ListItemText
             secondaryTypographyProps={{ className: classes.label }}
             secondary={tool.label}
@@ -80,5 +114,5 @@ export const Content = (props: ToolkitContentProps) => {
  * @public
  */
 export type ToolkitContentProps = {
-  tools: Tool[];
+  tools?: Tool[];
 };

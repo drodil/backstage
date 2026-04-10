@@ -64,5 +64,30 @@ export interface Config {
         value: string | number;
       }>;
     };
+    /**
+     * Toolkit plugin
+     * @visibility frontend
+     */
+    toolkit?: {
+      /**
+       * Tools to display in the toolkit
+       * @visibility frontend
+       */
+      tools?: Array<{
+        /**
+         * @visibility frontend
+         */
+        url: string;
+        /**
+         * @visibility frontend
+         */
+        label: string;
+        /**
+         * Icon key registered in the app's icon registry
+         * @visibility frontend
+         */
+        icon?: string;
+      }>;
+    };
   };
 }
