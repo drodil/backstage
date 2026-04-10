@@ -26,28 +26,29 @@
 
 import { lazy as reactLazy } from 'react';
 import {
+  ApiBlueprint,
+  AppRootElementBlueprint,
   createExtensionInput,
-  PageBlueprint,
-  NavItemBlueprint,
   createFrontendPlugin,
   createRouteRef,
-  AppRootElementBlueprint,
-  identityApiRef,
-  storageApiRef,
   errorApiRef,
-  ApiBlueprint,
   ExtensionBoundary,
+  identityApiRef,
+  NavItemBlueprint,
+  PageBlueprint,
+  storageApiRef,
 } from '@backstage/frontend-plugin-api';
 import { VisitListener } from './components/';
 import { visitsApiRef, VisitsStorageApi, VisitsWebStorageApi } from './api';
 import HomeIcon from '@material-ui/icons/Home';
 import {
-  homePageWidgetDataRef,
-  homePageLayoutComponentDataRef,
   HomePageLayoutBlueprint,
-  HomePageWidgetBlueprint,
+  homePageLayoutComponentDataRef,
   type HomePageLayoutProps,
+  HomePageWidgetBlueprint,
+  homePageWidgetDataRef,
 } from '@backstage/plugin-home-react/alpha';
+import { homeTranslationRef as _homeTranslationRef } from './translation';
 
 const rootRouteRef = createRouteRef();
 
@@ -152,6 +153,7 @@ const homePageToolkitWidget = HomePageWidgetBlueprint.make({
   },
 });
 
+// TODO: Move this to catalog plugin
 const homePageStarredEntitiesWidget = HomePageWidgetBlueprint.make({
   name: 'starred-entities',
   params: {
@@ -198,11 +200,70 @@ const homePageRandomJokeWidget = HomePageWidgetBlueprint.make({
   },
 });
 
+const homePageTopVisitedWidget = HomePageWidgetBlueprint.make({
+  name: 'top-visited',
+  disabled: true,
+  params: {
+    name: 'HomePageTopVisited',
+    title: 'Top Visited',
+    components: () =>
+      import('./homePageComponents/VisitedByType/TopVisited').then(m => ({
+        Content: m.Content,
+        Actions: m.Actions,
+        ContextProvider: m.ContextProvider,
+      })),
+  },
+});
+
+const homePageRecentlyVisitedWidget = HomePageWidgetBlueprint.make({
+  name: 'recently-visited',
+  disabled: true,
+  params: {
+    name: 'HomePageRecentlyVisited',
+    title: 'Recently Visited',
+    components: () =>
+      import('./homePageComponents/VisitedByType/RecentlyVisited').then(m => ({
+        Content: m.Content,
+        Actions: m.Actions,
+        ContextProvider: m.ContextProvider,
+      })),
+  },
+});
+
+const homePageWelcomeTitleWidget = HomePageWidgetBlueprint.make({
+  name: 'welcome',
+  params: {
+    name: 'HomePageWelcomeTitle',
+    title: 'Welcome',
+    components: () =>
+      import('./homePageComponents/WelcomeTitle').then(m => ({
+        Content: m.WelcomeTitle,
+      })),
+  },
+});
+
 /**
  * Home plugin for the new frontend system.
  *
  * Provides core homepage functionality with optional visit tracking extensions.
  * Visit tracking extensions are disabled by default and can be enabled via app-config.yaml.
+ *
+ * @remarks
+ * The following extensions are disabled by default and must be enabled together:
+ * - `api:home/visits` - The visits API for tracking page visits
+ * - `app-root-element:home/visit-listener` - Listener for tracking visits
+ * - `home-page-widget:home/top-visited` - Widget displaying top visited pages
+ * - `home-page-widget:home/recently-visited` - Widget displaying recently visited pages
+ *
+ * To enable visit tracking, add to your app-config.yaml:
+ * ```yaml
+ * app:
+ *   extensions:
+ *     - api:home/visits
+ *     - app-root-element:home/visit-listener
+ *     - home-page-widget:home/top-visited
+ *     - home-page-widget:home/recently-visited
+ * ```
  *
  * @alpha
  */
@@ -219,13 +280,14 @@ export default createFrontendPlugin({
     homePageToolkitWidget,
     homePageStarredEntitiesWidget,
     homePageRandomJokeWidget,
+    homePageTopVisitedWidget,
+    homePageRecentlyVisitedWidget,
+    homePageWelcomeTitleWidget,
   ],
   routes: {
     root: rootRouteRef,
   },
 });
-
-import { homeTranslationRef as _homeTranslationRef } from './translation';
 
 /**
  * @alpha
