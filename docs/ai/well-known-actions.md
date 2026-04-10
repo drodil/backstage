@@ -26,6 +26,13 @@ This is a (non-exhaustive) list of actions that are known to be part of the Acti
 
 - `notifications.get-notifications` (Get Notifications): Fetches notifications for the currently authenticated user. Defaults to returning only unread notifications. Supports filtering by read status (`unread`, `read`, `saved`, `all`), severity, topic, free-text search, and creation date. Supports pagination via `offset` and `limit`.
 
+### TechDocs
+
+- `techdocs.get-techdocs-metadata` (Get TechDocs Metadata): Retrieves build metadata (site name, ETag, build timestamp) for the TechDocs documentation site of a catalog entity.
+- `techdocs.list-techdocs-pages` (List TechDocs Pages): Lists all available documentation pages for a catalog entity, returning each page's title and relative path within the docs site.
+- `techdocs.get-techdocs-page` (Get TechDocs Page): Retrieves the plain-text content of a specific documentation page for a catalog entity. Use `list-techdocs-pages` first to discover available paths.
+- `techdocs.sync-techdocs` (Sync TechDocs): Triggers a TechDocs documentation sync for a catalog entity. Set `waitForCompletion: true` to block until the build finishes; defaults to fire-and-forget.
+
 ### Scaffolder
 
 - `scaffolder.dry-run-template` (Dry Run Scaffolder Template): Dry-runs a scaffolder template to validate it without making changes. Returns success with execution logs, or errors for validation failures.
