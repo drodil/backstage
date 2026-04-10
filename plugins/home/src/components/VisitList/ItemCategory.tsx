@@ -14,29 +14,16 @@
  * limitations under the License.
  */
 
-import Chip from '@material-ui/core/Chip';
-import { makeStyles } from '@material-ui/core/styles';
 import { Visit } from '../../api/VisitsApi';
 import { useVisitDisplay } from './Context';
-
-const useStyles = makeStyles(theme => ({
-  chip: {
-    color: theme.palette.common.white,
-    fontWeight: 'bold',
-    margin: 0,
-  },
-}));
+import styles from './ItemCategory.module.css';
 
 export const ItemCategory = ({ visit }: { visit: Visit }) => {
-  const classes = useStyles();
   const { getChipColor, getLabel } = useVisitDisplay();
 
   return (
-    <Chip
-      size="small"
-      className={classes.chip}
-      label={getLabel(visit)}
-      style={{ background: getChipColor(visit) }}
-    />
+    <span className={styles.tag} style={{ background: getChipColor(visit) }}>
+      {getLabel(visit)}
+    </span>
   );
 };

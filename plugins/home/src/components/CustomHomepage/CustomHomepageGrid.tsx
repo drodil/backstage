@@ -31,13 +31,7 @@ import {
 } from '@backstage/core-plugin-api';
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
-import Dialog from '@material-ui/core/Dialog';
-import {
-  createStyles,
-  makeStyles,
-  Theme,
-  useTheme,
-} from '@material-ui/core/styles';
+import { Dialog, DialogTrigger, Text } from '@backstage/ui';
 import { compact } from 'lodash';
 import useObservable from 'react-use/esm/useObservable';
 import {
@@ -45,7 +39,6 @@ import {
   ErrorBoundary,
   Progress,
 } from '@backstage/core-components';
-import Typography from '@material-ui/core/Typography';
 import { WidgetSettingsOverlay } from './WidgetSettingsOverlay';
 import { AddWidgetDialog } from './AddWidgetDialog';
 import { CustomHomepageButtons } from './CustomHomepageButtons';
@@ -62,41 +55,20 @@ import {
 import { CardConfig } from '@backstage/plugin-home-react';
 import { useTranslationRef } from '@backstage/frontend-plugin-api';
 import { homeTranslationRef } from '../../translation';
+import gridStyles from './CustomHomepageGrid.module.css';
+
+// Default breakpoints matching Backstage/MUI default theme
+const DEFAULT_BREAKPOINTS = {
+  xl: 1920,
+  lg: 1280,
+  md: 960,
+  sm: 600,
+  xs: 0,
+  xxs: 0,
+};
 
 // eslint-disable-next-line new-cap
 const ResponsiveGrid = WidthProvider(Responsive);
-
-const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    responsiveGrid: {
-      '& .react-grid-item > .react-resizable-handle:after': {
-        position: 'absolute',
-        content: '""',
-        borderStyle: 'solid',
-        borderWidth: '0 0 20px 20px',
-        borderColor: `transparent transparent ${theme.palette.primary.light} transparent`,
-      },
-    },
-    contentHeaderBtn: {
-      marginLeft: theme.spacing(2),
-    },
-    widgetWrapper: {
-      '& > div[class*="MuiCard-root"]': {
-        width: '100%',
-        height: '100%',
-      },
-      '& div[class*="MuiCardContent-root"]': {
-        overflow: 'auto',
-      },
-      '& + .react-grid-placeholder': {
-        backgroundColor: theme.palette.primary.light,
-      },
-      '&.edit > :active': {
-        cursor: 'move',
-      },
-    },
-  }),
-);
 
 function useHomeStorage(
   defaultWidgets: GridWidget[],
@@ -214,8 +186,6 @@ const availableWidgetsFilter = (elements: ElementCollection) => {
  * @public
  */
 export const CustomHomepageGrid = (props: CustomHomepageGridProps) => {
-  const styles = useStyles();
-  const theme = useTheme();
   const availableWidgets = useElementFilter(
     props.children,
     availableWidgetsFilter,
@@ -368,19 +338,21 @@ export const CustomHomepageGrid = (props: CustomHomepageGridProps) => {
           cancel={handleCancel}
         />
       </ContentHeader>
-      <Dialog
-        open={addWidgetDialogOpen}
-        onClose={() => setAddWidgetDialogOpen(false)}
+      <DialogTrigger
+        isOpen={addWidgetDialogOpen}
+        onOpenChange={setAddWidgetDialogOpen}
       >
-        <AddWidgetDialog widgets={availableWidgets} handleAdd={handleAdd} />
-      </Dialog>
+        <Dialog isDismissable>
+          <AddWidgetDialog widgets={availableWidgets} handleAdd={handleAdd} />
+        </Dialog>
+      </DialogTrigger>
       {!editMode && widgets.length === 0 && (
-        <Typography variant="h5" align="center">
+        <Text as="h5" style={{ textAlign: 'center' }}>
           {t('customHomepage.noWidgets')}
-        </Typography>
+        </Text>
       )}
       <ResponsiveGrid
-        className={styles.responsiveGrid}
+        className={gridStyles.responsiveGrid}
         measureBeforeMount
         compactType={props.compactType}
         style={props.style}
@@ -390,7 +362,7 @@ export const CustomHomepageGrid = (props: CustomHomepageGridProps) => {
         containerPadding={props.containerPadding}
         margin={props.containerMargin}
         breakpoints={
-          props.breakpoints ? props.breakpoints : theme.breakpoints.values
+          props.breakpoints ? props.breakpoints : DEFAULT_BREAKPOINTS
         }
         cols={
           props.cols
@@ -417,9 +389,13 @@ export const CustomHomepageGrid = (props: CustomHomepageGridProps) => {
           return (
             <div
               key={l.i}
-              className={`${styles.widgetWrapper} ${editMode && 'edit'} ${
-                w.movable === false && 'disabled'
-              }`}
+              className={[
+                gridStyles.widgetWrapper,
+                editMode && gridStyles.edit,
+                w.movable === false && gridStyles.disabled,
+              ]
+                .filter(Boolean)
+                .join(' ')}
             >
               <ErrorBoundary>
                 <widget.component.type {...widgetProps} />

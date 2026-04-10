@@ -16,24 +16,14 @@
 
 import { useState } from 'react';
 import { SettingsModal } from '@backstage/plugin-home-react';
-import Accordion from '@material-ui/core/Accordion';
-import AccordionDetails from '@material-ui/core/AccordionDetails';
-import AccordionSummary from '@material-ui/core/AccordionSummary';
-import Typography from '@material-ui/core/Typography';
-import IconButton from '@material-ui/core/IconButton';
-import { Theme } from '@material-ui/core/styles';
-import { makeStyles } from '@material-ui/core/styles';
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import SettingsIcon from '@material-ui/icons/Settings';
-
-const useStyles = makeStyles((theme: Theme) => ({
-  settingsIconButton: {
-    padding: theme.spacing(0, 1, 0, 0),
-  },
-  contentContainer: {
-    width: '100%',
-  },
-}));
+import {
+  Accordion,
+  AccordionTrigger,
+  AccordionPanel,
+  ButtonIcon,
+} from '@backstage/ui';
+import { RiSettingsLine } from '@remixicon/react';
+import styles from './ComponentAccordion.module.css';
 
 export const ComponentAccordion = (props: {
   title?: string;
@@ -53,7 +43,6 @@ export const ComponentAccordion = (props: {
     ...childProps
   } = props;
 
-  const classes = useStyles();
   const [settingsIsExpanded, setSettingsIsExpanded] = useState(false);
   const [isExpanded, setIsExpanded] = useState(expanded);
 
@@ -73,30 +62,31 @@ export const ComponentAccordion = (props: {
           <Settings />
         </SettingsModal>
       )}
-      <Accordion
-        expanded={isExpanded}
-        onChange={(_e: any, expandedValue: boolean) =>
-          setIsExpanded(expandedValue)
-        }
-      >
-        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-          {Settings && (
-            <IconButton
-              onClick={handleOpenSettings}
-              className={classes.settingsIconButton}
-            >
-              <SettingsIcon />
-            </IconButton>
-          )}
-          <Typography>{title}</Typography>
-        </AccordionSummary>
-        <AccordionDetails>
-          <div className={classes.contentContainer}>
-            <Content />
-            {Actions && <Actions />}
-          </div>
-        </AccordionDetails>
-      </Accordion>
+      <div className={styles.wrapper}>
+        {Settings && (
+          <ButtonIcon
+            aria-label="settings"
+            variant="secondary"
+            icon={<RiSettingsLine size={16} />}
+            onPress={handleOpenSettings}
+            className={styles.settingsButton}
+          />
+        )}
+        <div className={styles.accordionOuter}>
+          <Accordion
+            isExpanded={isExpanded}
+            onExpandedChange={(isExp: boolean) => setIsExpanded(isExp)}
+          >
+            <AccordionTrigger title={title} />
+            <AccordionPanel>
+              <div className={styles.contentContainer}>
+                <Content />
+                {Actions && <Actions />}
+              </div>
+            </AccordionPanel>
+          </Accordion>
+        </div>
+      </div>
     </>
   );
 

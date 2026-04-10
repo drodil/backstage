@@ -14,8 +14,7 @@
  * limitations under the License.
  */
 
-import { Overrides } from '@material-ui/core/styles/overrides';
-import { StyleRules } from '@material-ui/core/styles/withStyles';
+import { CSSProperties } from 'react';
 import { PluginHomeContentModalClassKey } from './components/ContentModal';
 
 /** @public */
@@ -24,9 +23,9 @@ export type PluginHomeComponentsNameToClassKey = {
 };
 
 /** @public */
-export type BackstageOverrides = Overrides & {
+export type BackstageOverrides = {
   [Name in keyof PluginHomeComponentsNameToClassKey]?: Partial<
-    StyleRules<PluginHomeComponentsNameToClassKey[Name]>
+    Record<PluginHomeComponentsNameToClassKey[Name], CSSProperties>
   >;
 };
 

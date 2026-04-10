@@ -13,11 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import FormControl from '@material-ui/core/FormControl';
-import FormLabel from '@material-ui/core/FormLabel';
-import RadioGroup from '@material-ui/core/RadioGroup';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Radio from '@material-ui/core/Radio';
+import { RadioGroup, Radio } from '@backstage/ui';
 import { useRandomJoke, JokeType } from './Context';
 import upperFirst from 'lodash/upperFirst';
 
@@ -25,22 +21,12 @@ export const Settings = () => {
   const { type, handleChangeType } = useRandomJoke();
   const JOKE_TYPES: JokeType[] = ['any' as JokeType, 'programming' as JokeType];
   return (
-    <FormControl component="fieldset">
-      <FormLabel component="legend">Joke Type</FormLabel>
-      <RadioGroup
-        aria-label="joke type"
-        value={type}
-        onChange={e => handleChangeType(e.target.value)}
-      >
-        {JOKE_TYPES.map(t => (
-          <FormControlLabel
-            key={t}
-            value={t}
-            control={<Radio />}
-            label={upperFirst(t)}
-          />
-        ))}
-      </RadioGroup>
-    </FormControl>
+    <RadioGroup label="Joke Type" value={type} onChange={handleChangeType}>
+      {JOKE_TYPES.map(t => (
+        <Radio key={t} value={t}>
+          {upperFirst(t)}
+        </Radio>
+      ))}
+    </RadioGroup>
   );
 };

@@ -1,0 +1,19 @@
+@layer components {
+  .item {
+    display: flex;
+    align-items: center;
+    padding: var(--bui-space-1) 0;
+    list-style: none;
+  }
+
+  .avatarSkeleton {
+    flex-shrink: 0;
+    border-radius: var(--bui-radius-full);
+    margin-right: var(--bui-space-2);
+  }
+
+  .textSkeleton {
+    flex: 1;
+    min-width: 0;
+  }
+}

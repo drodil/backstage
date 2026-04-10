@@ -23,7 +23,6 @@ import {
   entityRouteRef,
 } from '@backstage/plugin-catalog-react';
 import { catalogApiMock } from '@backstage/plugin-catalog-react/testUtils';
-import Grid from '@material-ui/core/Grid';
 import { ComponentType, PropsWithChildren } from 'react';
 
 const starredEntitiesApi = new MockStarredEntitiesApi();
@@ -94,8 +93,8 @@ export default {
 
 export const Default = () => {
   return (
-    <Grid item xs={12} md={6}>
+    <div style={{ maxWidth: '600px' }}>
       <HomePageStarredEntities />
-    </Grid>
+    </div>
   );
 };

@@ -83,7 +83,7 @@ export const CustomizableHomePage = () => {
         </Grid>
 
         <CustomHomepageGrid config={defaultConfig}>
-          <WelcomeTitle variant="h1" />
+          <WelcomeTitle />
           <HomePageSearchBar />
           <HomePageRecentlyVisited />
           <HomePageTopVisited />

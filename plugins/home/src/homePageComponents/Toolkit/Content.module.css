@@ -1,0 +1,39 @@
+@layer components {
+  .toolkit {
+    display: flex;
+    flex-wrap: wrap;
+    text-align: center;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .tool {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: var(--bui-space-1) var(--bui-space-2);
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .icon {
+    width: 64px;
+    height: 64px;
+    border-radius: var(--bui-radius-full);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    background-color: var(--bui-bg-app);
+  }
+
+  .label {
+    margin-top: var(--bui-space-2);
+    width: 72px;
+    font-size: 0.9em;
+    line-height: 1.25;
+    overflow-wrap: break-word;
+    color: var(--bui-fg-secondary);
+  }
+}

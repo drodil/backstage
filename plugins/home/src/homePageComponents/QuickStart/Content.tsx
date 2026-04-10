@@ -16,12 +16,11 @@
 
 import { JSX } from 'react';
 import { Link } from '@backstage/core-components';
-import Typography from '@material-ui/core/Typography';
-import Grid from '@material-ui/core/Grid';
+import { Text } from '@backstage/ui';
 import { ContentModal } from '@backstage/plugin-home-react';
-import { useStyles } from './styles';
 import { useTranslationRef } from '@backstage/frontend-plugin-api';
 import { homeTranslationRef } from '../../translation';
+import styles from './QuickStart.module.css';
 
 /**
  * Props customizing the <QuickStartCard/> component.
@@ -55,7 +54,6 @@ export type QuickStartCardProps = {
  * @public
  */
 export const Content = (props: QuickStartCardProps): JSX.Element => {
-  const styles = useStyles();
   const { t } = useTranslationRef(homeTranslationRef);
   return (
     <>
@@ -63,17 +61,13 @@ export const Content = (props: QuickStartCardProps): JSX.Element => {
         modalContent={props.image}
         linkContent={props.modalTitle || t('quickStart.title')}
       />
-      <Typography variant="body1" paragraph>
+      <Text as="p" variant="body-medium">
         {props.cardDescription || t('quickStart.description')}
-      </Typography>
+      </Text>
       <ContentModal modalContent={props.image} linkContent={props.image} />
-      <Grid
-        container
-        alignItems="center"
-        className={styles.contentActionContainer}
-      >
-        {props.downloadImage && <Grid item>{props.downloadImage}</Grid>}
-        <Grid item>
+      <div className={styles.contentActionContainer}>
+        {props.downloadImage && <div>{props.downloadImage}</div>}
+        <div>
           <Link
             to={props.docsLink || 'https://backstage.io/docs/getting-started/'}
             data-testid="quick-start-link-to-docs"
@@ -83,8 +77,8 @@ export const Content = (props: QuickStartCardProps): JSX.Element => {
           >
             {props.docsLinkTitle || t('quickStart.learnMoreLinkTitle')}
           </Link>
-        </Grid>
-      </Grid>
+        </div>
+      </div>
       {(props.additionalContent && props.additionalContent) ||
         (props.video && props.video)}
     </>

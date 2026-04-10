@@ -17,7 +17,6 @@ import { CompanyLogo } from './CompanyLogo';
 import { renderInTestApp, TestApiProvider } from '@backstage/test-utils';
 import { configApiRef } from '@backstage/core-plugin-api';
 import { ConfigReader } from '@backstage/core-app-api';
-import Typography from '@material-ui/core/Typography';
 
 describe('<CompanyLogo>', () => {
   it('should have a fall back if logo is not provided', async () => {
@@ -34,7 +33,7 @@ describe('<CompanyLogo>', () => {
 
   it('should show provided company logo', async () => {
     const { getByRole } = await renderInTestApp(
-      <CompanyLogo logo={<Typography variant="h1">Backstage</Typography>} />,
+      <CompanyLogo logo={<h1>Backstage</h1>} />,
     );
 
     expect(getByRole('heading', { name: 'Backstage' })).toBeInTheDocument();

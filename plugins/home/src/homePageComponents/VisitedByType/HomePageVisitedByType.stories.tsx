@@ -16,7 +16,6 @@
 
 import { TestApiProvider, wrapInTestApp } from '@backstage/test-utils';
 import { ComponentType, PropsWithChildren } from 'react';
-import Grid from '@material-ui/core/Grid';
 import { homePlugin } from '../../plugin';
 import { Visit, visitsApiRef } from '../../api/VisitsApi';
 import { createCardExtension } from '@backstage/plugin-home-react';
@@ -114,94 +113,94 @@ export default {
 
 export const RecentlyDefault = () => {
   return (
-    <Grid item xs={12} md={6}>
+    <div style={{ maxWidth: '600px' }}>
       <HomePageVisitedByType kind="recent" />
-    </Grid>
+    </div>
   );
 };
 
 export const RecentlyEmpty = () => {
   return (
-    <Grid item xs={12} md={6}>
+    <div style={{ maxWidth: '600px' }}>
       <HomePageVisitedByType kind="recent" visits={[]} />
-    </Grid>
+    </div>
   );
 };
 
 export const RecentlyFewItems = () => {
   return (
-    <Grid item xs={12} md={6}>
+    <div style={{ maxWidth: '600px' }}>
       <HomePageVisitedByType kind="recent" visits={visits.slice(0, 1)} />
-    </Grid>
+    </div>
   );
 };
 
 export const RecentlyMoreItems = () => {
   return (
-    <Grid item xs={12} md={6}>
+    <div style={{ maxWidth: '600px' }}>
       <HomePageVisitedByType
         kind="recent"
         numVisitsOpen={5}
         numVisitsTotal={6}
       />
-    </Grid>
+    </div>
   );
 };
 
 export const RecentlyLoading = () => {
   return (
-    <Grid item xs={12} md={6}>
+    <div style={{ maxWidth: '600px' }}>
       <HomePageVisitedByType
         kind="recent"
         numVisitsOpen={5}
         numVisitsTotal={6}
         loading
       />
-    </Grid>
+    </div>
   );
 };
 
 export const TopDefault = () => {
   return (
-    <Grid item xs={12} md={6}>
+    <div style={{ maxWidth: '600px' }}>
       <HomePageVisitedByType kind="top" />
-    </Grid>
+    </div>
   );
 };
 
 export const TopEmpty = () => {
   return (
-    <Grid item xs={12} md={6}>
+    <div style={{ maxWidth: '600px' }}>
       <HomePageVisitedByType kind="top" visits={[]} />
-    </Grid>
+    </div>
   );
 };
 
 export const TopFewItems = () => {
   return (
-    <Grid item xs={12} md={6}>
+    <div style={{ maxWidth: '600px' }}>
       <HomePageVisitedByType kind="top" visits={visits.slice(0, 1)} />
-    </Grid>
+    </div>
   );
 };
 
 export const TopMoreItems = () => {
   return (
-    <Grid item xs={12} md={6}>
+    <div style={{ maxWidth: '600px' }}>
       <HomePageVisitedByType kind="top" numVisitsOpen={5} numVisitsTotal={6} />
-    </Grid>
+    </div>
   );
 };
 
 export const TopLoading = () => {
   return (
-    <Grid item xs={12} md={6}>
+    <div style={{ maxWidth: '600px' }}>
       <HomePageVisitedByType
         kind="top"
         numVisitsOpen={5}
         numVisitsTotal={6}
         loading
       />
-    </Grid>
+    </div>
   );
 };

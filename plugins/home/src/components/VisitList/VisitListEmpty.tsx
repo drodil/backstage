@@ -15,19 +15,19 @@
  */
 
 import { useTranslationRef } from '@backstage/frontend-plugin-api';
-import Typography from '@material-ui/core/Typography';
+import { Text } from '@backstage/ui';
 import { homeTranslationRef } from '../../translation';
 
 export const VisitListEmpty = () => {
   const { t } = useTranslationRef(homeTranslationRef);
   return (
     <>
-      <Typography variant="body2" color="textSecondary">
+      <Text as="p" variant="body-small" color="secondary">
         {t('visitList.empty.title')}
-      </Typography>
-      <Typography variant="body2" color="textSecondary">
+      </Text>
+      <Text as="p" variant="body-small" color="secondary">
         {t('visitList.empty.description')}
-      </Typography>
+      </Text>
     </>
   );
 };

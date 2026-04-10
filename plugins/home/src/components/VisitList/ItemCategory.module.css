@@ -1,0 +1,11 @@
+@layer components {
+  .tag {
+    display: inline-block;
+    color: white;
+    font-size: var(--bui-font-size-1);
+    font-weight: var(--bui-font-weight-bold);
+    border-radius: var(--bui-radius-full);
+    padding: 2px var(--bui-space-2);
+    white-space: nowrap;
+  }
+}

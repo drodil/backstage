@@ -19,7 +19,7 @@ import { createApp } from '@backstage/frontend-defaults';
 import { catalogApiRef } from '@backstage/plugin-catalog-react';
 import { catalogApiMock } from '@backstage/plugin-catalog-react/testUtils';
 import catalogPlugin from '@backstage/plugin-catalog/alpha';
-import HomeIcon from '@material-ui/icons/Home';
+import { RiHomeLine } from '@remixicon/react';
 import ReactDOM from 'react-dom/client';
 import { Fragment } from 'react';
 
@@ -117,7 +117,7 @@ const homePageToolkitWidget = HomePageWidgetBlueprint.make({
         {
           url: 'https://backstage.io',
           label: 'Backstage Homepage',
-          icon: <HomeIcon />,
+          icon: <RiHomeLine />,
         },
       ],
     },

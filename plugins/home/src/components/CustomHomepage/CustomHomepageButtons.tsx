@@ -13,29 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import Button from '@material-ui/core/Button';
-import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
-import SaveIcon from '@material-ui/icons/Save';
-import DeleteIcon from '@material-ui/icons/Delete';
-import AddIcon from '@material-ui/icons/Add';
-import EditIcon from '@material-ui/icons/Edit';
-import CancelIcon from '@material-ui/icons/Cancel';
+import { Button } from '@backstage/ui';
+import {
+  RiSave3Line,
+  RiDeleteBinLine,
+  RiAddLine,
+  RiEditLine,
+  RiCloseLine,
+} from '@remixicon/react';
 import { useTranslationRef } from '@backstage/frontend-plugin-api';
 import { homeTranslationRef } from '../../translation';
-
-const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    contentHeaderBtn: {
-      marginLeft: theme.spacing(2),
-    },
-    widgetWrapper: {
-      '& > *:first-child': {
-        width: '100%',
-        height: '100%',
-      },
-    },
-  }),
-);
+import styles from './CustomHomepageButtons.module.css';
 
 interface CustomHomepageButtonsProps {
   editMode: boolean;
@@ -58,66 +46,63 @@ export const CustomHomepageButtons = (props: CustomHomepageButtonsProps) => {
     restoreDefault,
     cancel,
   } = props;
-  const styles = useStyles();
   const { t } = useTranslationRef(homeTranslationRef);
 
   return (
     <>
       {!editMode && numWidgets > 0 ? (
         <Button
-          variant="contained"
-          color="primary"
-          onClick={() => changeEditMode(true)}
+          variant="primary"
           size="small"
-          startIcon={<EditIcon />}
+          iconStart={<RiEditLine size={16} />}
+          onPress={() => changeEditMode(true)}
         >
           {t('customHomepageButtons.edit')}
         </Button>
       ) : (
         <>
-          <Button variant="contained" onClick={cancel} size="small">
+          <Button variant="secondary" size="small" onPress={cancel}>
             {t('customHomepageButtons.cancel')}
           </Button>
           {defaultConfigAvailable && (
             <Button
-              variant="contained"
-              className={styles.contentHeaderBtn}
-              onClick={restoreDefault}
+              variant="secondary"
               size="small"
-              startIcon={<CancelIcon />}
+              className={styles.contentHeaderBtn}
+              iconStart={<RiCloseLine size={16} />}
+              onPress={restoreDefault}
             >
               {t('customHomepageButtons.restoreDefaults')}
             </Button>
           )}
           {numWidgets > 0 && (
             <Button
-              variant="contained"
-              color="secondary"
-              className={styles.contentHeaderBtn}
-              onClick={clearLayout}
+              variant="secondary"
+              destructive
               size="small"
-              startIcon={<DeleteIcon />}
+              className={styles.contentHeaderBtn}
+              iconStart={<RiDeleteBinLine size={16} />}
+              onPress={clearLayout}
             >
               {t('customHomepageButtons.clearAll')}
             </Button>
           )}
           <Button
-            variant="contained"
-            className={styles.contentHeaderBtn}
-            onClick={() => setAddWidgetDialogOpen(true)}
+            variant="secondary"
             size="small"
-            startIcon={<AddIcon />}
+            className={styles.contentHeaderBtn}
+            iconStart={<RiAddLine size={16} />}
+            onPress={() => setAddWidgetDialogOpen(true)}
           >
             {t('customHomepageButtons.addWidget')}
           </Button>
           {numWidgets > 0 && (
             <Button
-              className={styles.contentHeaderBtn}
-              variant="contained"
-              color="primary"
-              onClick={() => changeEditMode(false)}
+              variant="primary"
               size="small"
-              startIcon={<SaveIcon />}
+              className={styles.contentHeaderBtn}
+              iconStart={<RiSave3Line size={16} />}
+              onPress={() => changeEditMode(false)}
             >
               {t('customHomepageButtons.save')}
             </Button>

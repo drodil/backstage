@@ -20,7 +20,7 @@ import { ComponentTabs } from './ComponentTabs';
 
 describe('<ComponentTabs>', () => {
   test('should render tabs without exploding', () => {
-    const { getByText } = render(
+    const { getByText, queryByText } = render(
       <ComponentTabs
         title="Random Jokes"
         tabs={[
@@ -40,13 +40,11 @@ describe('<ComponentTabs>', () => {
     expect(getByText('TabB')).toBeInTheDocument();
 
     expect(getByText('ContentA')).toBeInTheDocument();
-    expect(getByText('ContentB')).toHaveStyle({
-      display: 'none',
-    });
+    expect(queryByText('ContentB')).not.toBeInTheDocument();
   });
 
   test('should switch tab on click', async () => {
-    const { getByText } = render(
+    const { getByText, queryByText } = render(
       <ComponentTabs
         title="Random Jokes"
         tabs={[
@@ -62,14 +60,11 @@ describe('<ComponentTabs>', () => {
       />,
     );
 
-    expect(getByText('ContentB')).toHaveStyle({
-      display: 'none',
-    });
+    expect(queryByText('ContentB')).not.toBeInTheDocument();
 
     await userEvent.click(getByText('TabB'));
 
-    expect(getByText('ContentA')).toHaveStyle({
-      display: 'none',
-    });
+    expect(getByText('ContentB')).toBeInTheDocument();
+    expect(queryByText('ContentA')).not.toBeInTheDocument();
   });
 });

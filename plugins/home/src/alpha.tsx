@@ -37,10 +37,11 @@ import {
   errorApiRef,
   ApiBlueprint,
   ExtensionBoundary,
+  type IconComponent,
 } from '@backstage/frontend-plugin-api';
 import { VisitListener } from './components/';
 import { visitsApiRef, VisitsStorageApi, VisitsWebStorageApi } from './api';
-import HomeIcon from '@material-ui/icons/Home';
+import { RiHomeLine } from '@remixicon/react';
 import {
   homePageWidgetDataRef,
   homePageLayoutComponentDataRef,
@@ -50,6 +51,8 @@ import {
 } from '@backstage/plugin-home-react/alpha';
 
 const rootRouteRef = createRouteRef();
+
+const HomeIconComponent: IconComponent = () => <RiHomeLine />;
 
 const homePage = PageBlueprint.makeWithOverrides({
   inputs: {
@@ -126,7 +129,7 @@ const homeNavItem = NavItemBlueprint.make({
   params: {
     title: 'Home',
     routeRef: rootRouteRef,
-    icon: HomeIcon,
+    icon: HomeIconComponent,
   },
 });
 
@@ -145,7 +148,7 @@ const homePageToolkitWidget = HomePageWidgetBlueprint.make({
         {
           url: 'https://backstage.io',
           label: 'Backstage Docs',
-          icon: <HomeIcon />,
+          icon: <RiHomeLine />,
         },
       ],
     },
@@ -209,7 +212,7 @@ const homePageRandomJokeWidget = HomePageWidgetBlueprint.make({
 export default createFrontendPlugin({
   pluginId: 'home',
   title: 'Home',
-  icon: <HomeIcon />,
+  icon: <RiHomeLine />,
   info: { packageJson: () => import('../package.json') },
   extensions: [
     homePage,

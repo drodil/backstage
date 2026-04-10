@@ -15,11 +15,14 @@
  */
 
 import { useTranslationRef } from '@backstage/frontend-plugin-api';
-import Button from '@material-ui/core/Button';
-import Dialog from '@material-ui/core/Dialog';
-import DialogActions from '@material-ui/core/DialogActions';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogTitle from '@material-ui/core/DialogTitle';
+import {
+  Button,
+  Dialog,
+  DialogTrigger,
+  DialogHeader,
+  DialogBody,
+  DialogFooter,
+} from '@backstage/ui';
 import { homeReactTranslationRef } from '../translation';
 
 /** @public */
@@ -32,18 +35,20 @@ export const SettingsModal = (props: {
   const { open, close, componentName, children } = props;
   const { t } = useTranslationRef(homeReactTranslationRef);
   return (
-    <Dialog open={open} onClose={() => close()}>
-      <DialogTitle>
-        {componentName
-          ? `${t('settingsModal.title')} - ${componentName}`
-          : t('settingsModal.title')}
-      </DialogTitle>
-      <DialogContent>{children}</DialogContent>
-      <DialogActions>
-        <Button onClick={() => close()} color="primary" variant="contained">
-          {t('settingsModal.closeButtonTitle')}
-        </Button>
-      </DialogActions>
-    </Dialog>
+    <DialogTrigger isOpen={open} onOpenChange={v => !v && close()}>
+      <Dialog isDismissable>
+        <DialogHeader>
+          {componentName
+            ? `${t('settingsModal.title')} - ${componentName}`
+            : t('settingsModal.title')}
+        </DialogHeader>
+        <DialogBody>{children}</DialogBody>
+        <DialogFooter>
+          <Button variant="primary" onPress={() => close()}>
+            {t('settingsModal.closeButtonTitle')}
+          </Button>
+        </DialogFooter>
+      </Dialog>
+    </DialogTrigger>
   );
 };

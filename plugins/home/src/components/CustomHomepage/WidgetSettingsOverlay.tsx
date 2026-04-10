@@ -14,51 +14,25 @@
  * limitations under the License.
  */
 
-import Button from '@material-ui/core/Button';
-import Dialog from '@material-ui/core/Dialog';
-import DialogActions from '@material-ui/core/DialogActions';
-import DialogContent from '@material-ui/core/DialogContent';
-import Grid from '@material-ui/core/Grid';
-import IconButton from '@material-ui/core/IconButton';
-import Tooltip from '@material-ui/core/Tooltip';
 import {
-  alpha,
-  createStyles,
-  makeStyles,
-  Theme,
-} from '@material-ui/core/styles';
-import DeleteIcon from '@material-ui/icons/Delete';
-import SettingsIcon from '@material-ui/icons/Settings';
+  Button,
+  ButtonIcon,
+  Dialog,
+  DialogTrigger,
+  DialogBody,
+  DialogFooter,
+  TooltipTrigger,
+  Tooltip,
+} from '@backstage/ui';
+import { RiDeleteBinLine, RiSettingsLine } from '@remixicon/react';
 import { useState } from 'react';
 import { Widget } from './types';
-import { withTheme } from '@rjsf/core';
-import { Theme as MuiTheme } from '@rjsf/material-ui';
+import Form from '@rjsf/core';
 import validator from '@rjsf/validator-ajv8';
 import { useTranslationRef } from '@backstage/frontend-plugin-api';
 import { homeTranslationRef } from '../../translation';
+import styles from './WidgetSettingsOverlay.module.css';
 
-const Form = withTheme(MuiTheme);
-
-const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    iconGrid: {
-      height: '100%',
-      '& *': {
-        padding: 0,
-      },
-    },
-    settingsOverlay: {
-      position: 'absolute',
-      backgroundColor: alpha(theme.palette.background.paper, 0.93),
-      width: '100%',
-      height: '100%',
-      top: 0,
-      left: 0,
-      padding: theme.spacing(2),
-      color: 'white',
-    },
-  }),
-);
 interface WidgetSettingsOverlayProps {
   id: string;
   widget: Widget;
@@ -72,7 +46,6 @@ export const WidgetSettingsOverlay = (props: WidgetSettingsOverlayProps) => {
   const { id, widget, settings, handleRemove, handleSettingsSave, deletable } =
     props;
   const [settingsDialogOpen, setSettingsDialogOpen] = useState(false);
-  const styles = useStyles();
 
   const onClose = () => setSettingsDialogOpen(false);
   const { t } = useTranslationRef(homeTranslationRef);
@@ -80,70 +53,69 @@ export const WidgetSettingsOverlay = (props: WidgetSettingsOverlayProps) => {
   return (
     <div className={styles.settingsOverlay}>
       {widget.settingsSchema && (
-        <Dialog
-          open={settingsDialogOpen}
-          className="widgetSettingsDialog"
-          onClose={onClose}
+        <DialogTrigger
+          isOpen={settingsDialogOpen}
+          onOpenChange={setSettingsDialogOpen}
         >
-          <DialogContent>
-            <Form
-              validator={validator}
-              showErrorList={false}
-              schema={widget.settingsSchema}
-              uiSchema={widget.uiSchema}
-              noHtml5Validate
-              formData={settings}
-              formContext={{ settings }}
-              onSubmit={({ formData, errors }) => {
-                if (errors.length === 0) {
-                  handleSettingsSave(id, formData);
-                  setSettingsDialogOpen(false);
-                }
-              }}
-              experimental_defaultFormStateBehavior={{
-                allOf: 'populateDefaults',
-              }}
-            >
-              <DialogActions>
-                <Button color="primary" variant="contained" type="submit">
-                  {t('widgetSettingsOverlay.submitButtonTitle')}
-                </Button>
-                <Button color="secondary" onClick={onClose}>
-                  {t('widgetSettingsOverlay.cancelButtonTitle')}
-                </Button>
-              </DialogActions>
-            </Form>
-          </DialogContent>
-        </Dialog>
-      )}
-      <Grid
-        container
-        className={styles.iconGrid}
-        alignItems="center"
-        justifyContent="center"
-      >
-        {widget.settingsSchema && (
-          <Grid item className="overlayGridItem">
-            <Tooltip title={t('widgetSettingsOverlay.editSettingsTooptip')}>
-              <IconButton
-                color="primary"
-                onClick={() => setSettingsDialogOpen(true)}
+          <Dialog isDismissable className="widgetSettingsDialog">
+            <DialogBody>
+              <Form
+                validator={validator}
+                showErrorList={false}
+                schema={widget.settingsSchema}
+                uiSchema={widget.uiSchema}
+                noHtml5Validate
+                formData={settings}
+                formContext={{ settings }}
+                onSubmit={({ formData, errors }) => {
+                  if (errors.length === 0) {
+                    handleSettingsSave(id, formData);
+                    setSettingsDialogOpen(false);
+                  }
+                }}
+                experimental_defaultFormStateBehavior={{
+                  allOf: 'populateDefaults',
+                }}
               >
-                <SettingsIcon fontSize="large" />
-              </IconButton>
-            </Tooltip>
-          </Grid>
+                <DialogFooter>
+                  <Button variant="primary" type="submit">
+                    {t('widgetSettingsOverlay.submitButtonTitle')}
+                  </Button>
+                  <Button variant="secondary" slot="close" onPress={onClose}>
+                    {t('widgetSettingsOverlay.cancelButtonTitle')}
+                  </Button>
+                </DialogFooter>
+              </Form>
+            </DialogBody>
+          </Dialog>
+        </DialogTrigger>
+      )}
+      <div className={styles.iconRow}>
+        {widget.settingsSchema && (
+          <TooltipTrigger>
+            <ButtonIcon
+              aria-label={t('widgetSettingsOverlay.editSettingsTooptip')}
+              variant="primary"
+              icon={<RiSettingsLine size={24} />}
+              className="overlayGridItem"
+              onPress={() => setSettingsDialogOpen(true)}
+            />
+            <Tooltip>{t('widgetSettingsOverlay.editSettingsTooptip')}</Tooltip>
+          </TooltipTrigger>
         )}
         {deletable !== false && (
-          <Grid item className="overlayGridItem">
-            <Tooltip title={t('widgetSettingsOverlay.deleteWidgetTooltip')}>
-              <IconButton color="secondary" onClick={() => handleRemove(id)}>
-                <DeleteIcon fontSize="large" />
-              </IconButton>
-            </Tooltip>
-          </Grid>
+          <TooltipTrigger>
+            <ButtonIcon
+              aria-label={t('widgetSettingsOverlay.deleteWidgetTooltip')}
+              variant="secondary"
+              icon={<RiDeleteBinLine size={24} />}
+              className="overlayGridItem"
+              onPress={() => handleRemove(id)}
+            />
+            <Tooltip>{t('widgetSettingsOverlay.deleteWidgetTooltip')}</Tooltip>
+          </TooltipTrigger>
         )}
-      </Grid>
+      </div>
     </div>
   );
 };

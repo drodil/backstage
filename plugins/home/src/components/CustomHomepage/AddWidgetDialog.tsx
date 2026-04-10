@@ -15,14 +15,8 @@
  */
 
 import { Widget } from './types';
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogTitle from '@material-ui/core/DialogTitle';
-import ListItemAvatar from '@material-ui/core/ListItemAvatar';
-import AddIcon from '@material-ui/icons/Add';
-import ListItemText from '@material-ui/core/ListItemText';
-import Typography from '@material-ui/core/Typography';
+import { DialogHeader, DialogBody, Text } from '@backstage/ui';
+import { RiAddLine } from '@remixicon/react';
 import { useTranslationRef } from '@backstage/frontend-plugin-api';
 import { homeTranslationRef } from '../../translation';
 
@@ -40,42 +34,47 @@ export const AddWidgetDialog = (props: AddWidgetDialogProps) => {
   const { t } = useTranslationRef(homeTranslationRef);
   return (
     <>
-      <DialogTitle>{t('addWidgetDialog.title')}</DialogTitle>
-      <DialogContent>
-        <List dense>
+      <DialogHeader>{t('addWidgetDialog.title')}</DialogHeader>
+      <DialogBody>
+        <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
           {widgets.map(widget => {
             return (
-              <ListItem
-                key={widget.name}
-                button
-                onClick={() => handleAdd(widget)}
-              >
-                <ListItemAvatar>
-                  <AddIcon />
-                </ListItemAvatar>
-                <ListItemText
-                  secondary={
-                    widget.description && (
-                      <Typography
-                        component="span"
-                        variant="caption"
-                        color="textPrimary"
-                      >
-                        {widget.description}
-                      </Typography>
-                    )
-                  }
-                  primary={
-                    <Typography variant="body1" color="textPrimary">
+              <li key={widget.name}>
+                <button
+                  type="button"
+                  onClick={() => handleAdd(widget)}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 'var(--bui-space-2)',
+                    width: '100%',
+                    background: 'none',
+                    border: 'none',
+                    padding: 'var(--bui-space-2)',
+                    cursor: 'pointer',
+                    textAlign: 'left',
+                  }}
+                >
+                  <RiAddLine size={20} />
+                  <span>
+                    <Text as="span" variant="body-medium">
                       {getTitle(widget)}
-                    </Typography>
-                  }
-                />
-              </ListItem>
+                    </Text>
+                    {widget.description && (
+                      <>
+                        <br />
+                        <Text as="span" variant="body-small" color="secondary">
+                          {widget.description}
+                        </Text>
+                      </>
+                    )}
+                  </span>
+                </button>
+              </li>
             );
           })}
-        </List>
-      </DialogContent>
+        </ul>
+      </DialogBody>
     </>
   );
 };

@@ -20,9 +20,8 @@ import { rootRouteRef } from '../../routes';
 import { wrapInTestApp, TestApiProvider } from '@backstage/test-utils';
 import { configApiRef } from '@backstage/core-plugin-api';
 import { ConfigReader } from '@backstage/core-app-api';
-import Grid from '@material-ui/core/Grid';
-import { makeStyles } from '@material-ui/core/styles';
 import { ComponentType, PropsWithChildren } from 'react';
+import styles from './CompanyLogo.stories.module.css';
 
 export default {
   title: 'Plugins/Home/Components/CompanyLogo',
@@ -44,38 +43,24 @@ export default {
   tags: ['!manifest'],
 };
 
-const useLogoStyles = makeStyles(theme => ({
-  container: {
-    margin: theme.spacing(5, 0),
-  },
-  svg: {
-    width: 'auto',
-    height: 100,
-  },
-  path: {
-    fill: '#7df3e1',
-  },
-}));
-
 export const Default = () => {
-  const { container } = useLogoStyles();
-
   return (
-    <Grid container justifyContent="center" spacing={6}>
-      <HomePageCompanyLogo className={container} />
-    </Grid>
+    <div className={styles.container}>
+      <HomePageCompanyLogo />
+    </div>
   );
 };
 
 export const CustomLogo = () => {
-  const { container, svg, path } = useLogoStyles();
-
   return (
-    <Grid container justifyContent="center" spacing={6}>
+    <div className={styles.container}>
       <HomePageCompanyLogo
-        className={container}
-        logo={<TemplateBackstageLogo classes={{ svg, path }} />}
+        logo={
+          <TemplateBackstageLogo
+            classes={{ svg: styles.logoSvg, path: styles.logoPath }}
+          />
+        }
       />
-    </Grid>
+    </div>
   );
 };

@@ -18,16 +18,14 @@ import {
   EntityDisplayName,
   entityRouteParams,
 } from '@backstage/plugin-catalog-react';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import ListItemText from '@material-ui/core/ListItemText';
 import { Link } from 'react-router-dom';
 import { entityRouteRef } from '@backstage/plugin-catalog-react';
 import { useRouteRef } from '@backstage/core-plugin-api';
 import { FavoriteToggle } from '@backstage/core-components';
-import { makeStyles } from '@material-ui/core/styles';
+import { Text } from '@backstage/ui';
 import { useTranslationRef } from '@backstage/frontend-plugin-api';
 import { homeTranslationRef } from '../../translation';
+import styles from './StarredEntityListItem.module.css';
 
 type EntityListItemProps = {
   entity: Entity;
@@ -35,22 +33,11 @@ type EntityListItemProps = {
   showKind?: boolean;
 };
 
-const useStyles = makeStyles(theme => ({
-  listItem: {
-    paddingBottom: theme.spacing(0),
-    paddingTop: theme.spacing(0),
-  },
-  secondary: {
-    textTransform: 'uppercase',
-  },
-}));
-
 export const StarredEntityListItem = ({
   entity,
   onToggleStarredEntity,
   showKind,
 }: EntityListItemProps) => {
-  const classes = useStyles();
   const catalogEntityRoute = useRouteRef(entityRouteRef);
   const { t } = useTranslationRef(homeTranslationRef);
 
@@ -68,30 +55,39 @@ export const StarredEntityListItem = ({
   }
 
   return (
-    <ListItem
-      dense
-      className={classes.listItem}
-      component={Link}
-      button
-      to={catalogEntityRoute(entityRouteParams(entity))}
-    >
-      <ListItemIcon
-        // Prevent following the link when clicking on the icon
-        onClick={e => {
-          e.preventDefault();
-        }}
+    <li>
+      <Link
+        className={styles.listItem}
+        to={catalogEntityRoute(entityRouteParams(entity))}
       >
-        <FavoriteToggle
-          id={`remove-favorite-${entity.metadata.uid}`}
-          title={t('starredEntityListItem.removeFavoriteEntityTitle')}
-          isFavorite
-          onToggle={() => onToggleStarredEntity(entity)}
-        />
-      </ListItemIcon>
-      <ListItemText
-        primary={<EntityDisplayName hideIcon entityRef={entity} />}
-        secondary={secondaryText}
-      />
-    </ListItem>
+        <button
+          className={styles.actionIcon}
+          type="button"
+          onClick={e => {
+            e.preventDefault();
+          }}
+        >
+          <FavoriteToggle
+            id={`remove-favorite-${entity.metadata.uid}`}
+            title={t('starredEntityListItem.removeFavoriteEntityTitle')}
+            isFavorite
+            onToggle={() => onToggleStarredEntity(entity)}
+          />
+        </button>
+        <span className={styles.content}>
+          <EntityDisplayName hideIcon entityRef={entity} />
+          {secondaryText && (
+            <Text
+              as="span"
+              variant="body-x-small"
+              color="secondary"
+              className={styles.secondary}
+            >
+              {secondaryText}
+            </Text>
+          )}
+        </span>
+      </Link>
+    </li>
   );
 };

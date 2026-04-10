@@ -29,12 +29,11 @@ import {
 } from '@backstage/plugin-catalog-react';
 import { useApi } from '@backstage/core-plugin-api';
 import { EntityFilterQuery } from '@backstage/catalog-client';
-
-import Typography from '@material-ui/core/Typography';
-import { makeStyles } from '@material-ui/core/styles';
+import { Text } from '@backstage/ui';
 import { stringifyEntityRef } from '@backstage/catalog-model';
 import { useTranslationRef } from '@backstage/frontend-plugin-api';
 import { homeTranslationRef } from '../../translation';
+import styles from './Content.module.css';
 
 /**
  * Props customizing the <FeaturedDocsCard/> component.
@@ -60,28 +59,6 @@ export type FeaturedDocsCardClassKey =
   | 'docSubLink'
   | 'docsTitleLink';
 
-const useStyles = makeStyles(
-  theme => ({
-    docDescription: {
-      fontSize: theme.typography.body1.fontSize,
-      fontWeight: theme.typography.body1.fontWeight,
-      marginBottom: theme.spacing(2),
-      marginTop: theme.spacing(2),
-    },
-    docSubLink: {
-      fontSize: theme.typography.subtitle1.fontSize,
-      fontWeight: theme.typography.subtitle1.fontWeight,
-      lineHeight: theme.typography.subtitle1.lineHeight,
-    },
-    docsTitleLink: {
-      fontSize: theme.typography.h6.fontSize,
-      fontWeight: theme.typography.h6.fontWeight,
-      lineHeight: theme.typography.h6.lineHeight,
-    },
-  }),
-  { name: 'HomeFeaturedDocsCard' },
-);
-
 /**
  * A component to display specific Featured Docs.
  *
@@ -92,7 +69,6 @@ export const Content = (props: FeaturedDocsCardProps): JSX.Element => {
     props;
   const { t } = useTranslationRef(homeTranslationRef);
   const linkText = subLinkText || t('featuredDocsCard.learnMoreTitle');
-  const styles = useStyles();
   const catalogApi = useApi(catalogApiRef);
   const {
     value: entities,
@@ -133,9 +109,9 @@ export const Content = (props: FeaturedDocsCardProps): JSX.Element => {
             <EntityDisplayName entityRef={stringifyEntityRef(d)} />
           </Link>
           {d.metadata.description && (
-            <Typography className={styles.docDescription}>
+            <Text as="p" className={styles.docDescription}>
               {d.metadata.description}
-            </Typography>
+            </Text>
           )}
           <Link
             className={styles.docSubLink}

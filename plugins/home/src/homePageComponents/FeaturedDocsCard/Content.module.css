@@ -1,0 +1,18 @@
+@layer components {
+  .docDescription {
+    font-size: var(--bui-font-size-2);
+    margin-bottom: var(--bui-space-4);
+    margin-top: var(--bui-space-4);
+  }
+
+  .docSubLink {
+    font-size: var(--bui-font-size-2);
+    display: block;
+  }
+
+  .docsTitleLink {
+    font-size: var(--bui-font-size-3);
+    font-weight: var(--bui-font-weight-bold);
+    display: block;
+  }
+}

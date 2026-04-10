@@ -1,0 +1,21 @@
+@layer components {
+  .wrapper {
+    display: flex;
+    align-items: flex-start;
+  }
+
+  .settingsButton {
+    flex-shrink: 0;
+    margin-right: var(--bui-space-1);
+    margin-top: var(--bui-space-1);
+  }
+
+  .accordionOuter {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .contentContainer {
+    width: 100%;
+  }
+}

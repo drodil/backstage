@@ -21,26 +21,13 @@ import {
 import { Entity, stringifyEntityRef } from '@backstage/catalog-model';
 import { useApi } from '@backstage/core-plugin-api';
 import { Progress, ResponseErrorPanel } from '@backstage/core-components';
-import List from '@material-ui/core/List';
-import Typography from '@material-ui/core/Typography';
-import Tabs from '@material-ui/core/Tabs';
-import Tab from '@material-ui/core/Tab';
+import { Text, Tabs, TabList, Tab, TabPanel } from '@backstage/ui';
 import { ReactNode, useState } from 'react';
 import useAsync from 'react-use/esm/useAsync';
 import { StarredEntityListItem } from '../../components/StarredEntityListItem/StarredEntityListItem';
-import { makeStyles } from '@material-ui/core/styles';
 import { useTranslationRef } from '@backstage/frontend-plugin-api';
 import { homeTranslationRef } from '../../translation';
-
-const useStyles = makeStyles(theme => ({
-  tabs: {
-    marginBottom: theme.spacing(1),
-  },
-  list: {
-    paddingTop: 0,
-    paddingBottom: 0,
-  },
-}));
+import styles from './Content.module.css';
 
 /**
  * Props for the StarredEntities component
@@ -61,10 +48,9 @@ export const Content = ({
   noStarredEntitiesMessage,
   groupByKind,
 }: StarredEntitiesProps) => {
-  const classes = useStyles();
   const catalogApi = useApi(catalogApiRef);
   const { starredEntities, toggleStarredEntity } = useStarredEntities();
-  const [activeTab, setActiveTab] = useState(0);
+  const [activeTab, setActiveTab] = useState('');
   const { t } = useTranslationRef(homeTranslationRef);
 
   // Grab starred entities from catalog to ensure they still exist and also retrieve display titles
@@ -90,10 +76,10 @@ export const Content = ({
 
   if (starredEntities.size === 0)
     return (
-      <Typography variant="body1">
+      <Text as="p" variant="body-medium">
         {noStarredEntitiesMessage ||
           t('starredEntities.noStarredEntitiesMessage')}
-      </Typography>
+      </Text>
     );
 
   if (entities.loading) {
@@ -110,13 +96,15 @@ export const Content = ({
   });
 
   const groupByKindEntries = Object.entries(groupedEntities);
+  const firstKind = groupByKindEntries[0]?.[0] ?? '';
+  const selectedTab = activeTab || firstKind;
 
   return entities.error ? (
     <ResponseErrorPanel error={entities.error} />
   ) : (
     <div>
       {!groupByKind && (
-        <List className={classes.list}>
+        <ul className={styles.list}>
           {entities.value
             ?.sort((a, b) =>
               (a.metadata.title ?? a.metadata.name).localeCompare(
@@ -131,45 +119,44 @@ export const Content = ({
                 showKind
               />
             ))}
-        </List>
+        </ul>
       )}
 
       {groupByKind && (
         <Tabs
-          className={classes.tabs}
-          value={activeTab}
-          onChange={(_, newValue) => setActiveTab(newValue)}
-          variant="scrollable"
-          scrollButtons="auto"
-          aria-label="entity-tabs"
+          className={styles.tabs}
+          selectedKey={selectedTab}
+          onSelectionChange={key => setActiveTab(key as string)}
         >
-          {groupByKindEntries.map(([kind]) => (
-            <Tab key={kind} label={kind} />
+          <TabList aria-label="entity-tabs">
+            {groupByKindEntries.map(([kind]) => (
+              <Tab key={kind} id={kind}>
+                {kind}
+              </Tab>
+            ))}
+          </TabList>
+          {groupByKindEntries.map(([kind, entitiesByKind]) => (
+            <TabPanel key={kind} id={kind}>
+              <ul className={styles.list}>
+                {entitiesByKind
+                  ?.sort((a, b) =>
+                    (a.metadata.title ?? a.metadata.name).localeCompare(
+                      b.metadata.title ?? b.metadata.name,
+                    ),
+                  )
+                  .map(entity => (
+                    <StarredEntityListItem
+                      key={stringifyEntityRef(entity)}
+                      entity={entity}
+                      onToggleStarredEntity={toggleStarredEntity}
+                      showKind={false}
+                    />
+                  ))}
+              </ul>
+            </TabPanel>
           ))}
         </Tabs>
       )}
-
-      {groupByKind &&
-        groupByKindEntries.map(([kind, entitiesByKind], index) => (
-          <div key={kind} hidden={groupByKind && activeTab !== index}>
-            <List className={classes.list}>
-              {entitiesByKind
-                ?.sort((a, b) =>
-                  (a.metadata.title ?? a.metadata.name).localeCompare(
-                    b.metadata.title ?? b.metadata.name,
-                  ),
-                )
-                .map(entity => (
-                  <StarredEntityListItem
-                    key={stringifyEntityRef(entity)}
-                    entity={entity}
-                    onToggleStarredEntity={toggleStarredEntity}
-                    showKind={false}
-                  />
-                ))}
-            </List>
-          </div>
-        ))}
     </div>
   );
 };

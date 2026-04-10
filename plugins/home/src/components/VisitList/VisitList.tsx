@@ -15,14 +15,13 @@
  */
 
 import { ReactElement } from 'react';
-import Collapse from '@material-ui/core/Collapse';
-import List from '@material-ui/core/List';
 import { Visit } from '../../api/VisitsApi';
 import { VisitListItem } from './VisitListItem';
 import { ItemDetailType } from './ItemDetail';
 import { VisitListEmpty } from './VisitListEmpty';
 import { VisitListFew } from './VisitListFew';
 import { VisitListSkeleton } from './VisitListSkeleton';
+import styles from './VisitList.module.css';
 
 /**
  * @internal
@@ -71,7 +70,7 @@ export const VisitList = ({
           <VisitListItem visit={visit} key={index} detailType={detailType} />
         ))}
         {visits.length > numVisitsOpen && (
-          <Collapse in={!collapsed}>
+          <div style={{ display: collapsed ? 'none' : 'block' }}>
             {visits.slice(numVisitsOpen, numVisitsTotal).map((visit, index) => (
               <VisitListItem
                 visit={visit}
@@ -79,7 +78,7 @@ export const VisitList = ({
                 detailType={detailType}
               />
             ))}
-          </Collapse>
+          </div>
         )}
       </>
     );
@@ -88,9 +87,7 @@ export const VisitList = ({
   return (
     <>
       {title && <h5>{title}</h5>}
-      <List dense disablePadding>
-        {listBody}
-      </List>
+      <ul className={styles.list}>{listBody}</ul>
     </>
   );
 };

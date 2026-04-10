@@ -14,14 +14,19 @@
  * limitations under the License.
  */
 
-import { Button } from '@backstage/ui';
-import { useRandomJoke } from './Context';
+@layer components {
+  .container {
+    margin: 40px 0;
+    display: flex;
+    justify-content: center;
+  }
 
-export const Actions = () => {
-  const { rerollJoke } = useRandomJoke();
-  return (
-    <Button variant="primary" onPress={() => rerollJoke()}>
-      Reroll
-    </Button>
-  );
-};
+  .logoSvg {
+    width: auto;
+    height: 100px;
+  }
+
+  .logoPath {
+    fill: #7df3e1;
+  }
+}

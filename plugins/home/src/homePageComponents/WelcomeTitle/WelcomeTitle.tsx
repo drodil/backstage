@@ -17,26 +17,22 @@ import {
   alertApiRef,
   identityApiRef,
   useApi,
+  useApiHolder,
 } from '@backstage/core-plugin-api';
-import Tooltip from '@material-ui/core/Tooltip';
-import Typography from '@material-ui/core/Typography';
+import { toastApiRef } from '@backstage/frontend-plugin-api';
+import { Tooltip, TooltipTrigger, Text } from '@backstage/ui';
 import { useEffect, useMemo } from 'react';
 import useAsync from 'react-use/esm/useAsync';
 import { getTimeBasedGreeting } from './timeUtil';
-import { Variant } from '@material-ui/core/styles/createTypography';
 
 /** @public */
 export type WelcomeTitleLanguageProps = {
   language?: string[];
-  variant?: Variant | 'inherit';
 };
 
-export const WelcomeTitle = ({
-  language,
-  variant = 'inherit',
-}: WelcomeTitleLanguageProps) => {
+export const WelcomeTitle = ({ language }: WelcomeTitleLanguageProps) => {
   const identityApi = useApi(identityApiRef);
-  const alertApi = useApi(alertApiRef);
+  const apiHolder = useApiHolder();
   const greeting = useMemo(() => getTimeBasedGreeting(language), [language]);
 
   const { value: profile, error } = useAsync(() =>
@@ -45,18 +41,22 @@ export const WelcomeTitle = ({
 
   useEffect(() => {
     if (error) {
-      alertApi.post({
-        message: `Failed to load user identity: ${error}`,
-        severity: 'error',
-      });
+      const message = `Failed to load user identity: ${error}`;
+      const toastApi = apiHolder.get(toastApiRef);
+      if (toastApi) {
+        toastApi.post({ title: message, status: 'danger' });
+      } else {
+        apiHolder.get(alertApiRef)?.post({ message, severity: 'error' });
+      }
     }
-  }, [error, alertApi]);
+  }, [error, apiHolder]);
 
   return (
-    <Tooltip title={greeting.language}>
-      <Typography component="span" variant={variant}>{`${greeting.greeting}${
+    <TooltipTrigger>
+      <Text as="span">{`${greeting.greeting}${
         profile?.displayName ? `, ${profile?.displayName}` : ''
-      }!`}</Typography>
-    </Tooltip>
+      }!`}</Text>
+      <Tooltip>{greeting.language}</Tooltip>
+    </TooltipTrigger>
   );
 };

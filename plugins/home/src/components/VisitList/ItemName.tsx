@@ -14,40 +14,28 @@
  * limitations under the License.
  */
 
-import Typography from '@material-ui/core/Typography';
-import { makeStyles } from '@material-ui/core/styles';
+import { Text } from '@backstage/ui';
 import { Visit } from '../../api/VisitsApi';
 import { Link } from '@backstage/core-components';
 import { EntityRefLink } from '@backstage/plugin-catalog-react';
+import styles from './ItemName.module.css';
 
-const useStyles = makeStyles(theme => ({
-  name: {
-    marginLeft: '0.8rem',
-    marginRight: '0.8rem',
-    fontSize: theme.typography.body1.fontSize,
-  },
-}));
 export const ItemName = ({ visit }: { visit: Visit }) => {
-  const classes = useStyles();
-
   if (visit.entityRef)
     return (
       <EntityRefLink
         entityRef={visit.entityRef}
-        className={classes.name}
+        className={styles.name}
         hideIcon
         disableTooltip
       />
     );
 
   return (
-    <Typography
-      component={Link}
-      to={visit.pathname}
-      noWrap
-      className={classes.name}
-    >
-      {visit.name}
-    </Typography>
+    <Link to={visit.pathname} className={styles.name}>
+      <Text as="span" truncate>
+        {visit.name}
+      </Text>
+    </Link>
   );
 };

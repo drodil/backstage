@@ -17,9 +17,8 @@
 import { QuickStartCard } from '../../plugin';
 import { ComponentType, PropsWithChildren } from 'react';
 import { wrapInTestApp } from '@backstage/test-utils';
-import Grid from '@material-ui/core/Grid';
-import Typography from '@material-ui/core/Typography';
-import OpenInNewIcon from '@material-ui/icons/OpenInNew';
+import { Text } from '@backstage/ui';
+import { RiExternalLinkLine } from '@remixicon/react';
 import ContentImage from './static/backstageSystemModel.png';
 
 export default {
@@ -32,7 +31,7 @@ export default {
 
 export const Default = () => {
   return (
-    <Grid item xs={12} md={6}>
+    <div style={{ maxWidth: '600px' }}>
       <QuickStartCard
         image={
           <img
@@ -43,13 +42,13 @@ export const Default = () => {
           />
         }
       />
-    </Grid>
+    </div>
   );
 };
 
 export const Customized = () => {
   return (
-    <Grid item xs={12} md={6}>
+    <div style={{ maxWidth: '600px' }}>
       <QuickStartCard
         title="Onboarding to the Catalog"
         modalTitle="Onboarding Quick Start"
@@ -65,26 +64,26 @@ export const Customized = () => {
         }
         cardDescription="Backstage system model will help you create new entities"
         additionalContent={
-          <Typography variant="body2" paragraph>
+          <Text as="p" variant="body-small">
             This is a custom description for the Quick Start card. It can be
             used to provide additional information or context about the Quick
             Start process.
-          </Typography>
+          </Text>
         }
       />
-    </Grid>
+    </div>
   );
 };
 
 export const CustomDocLink = () => {
   return (
-    <Grid item xs={12} md={6}>
+    <div style={{ maxWidth: '600px' }}>
       <QuickStartCard
         title="Onboarding to the Catalog"
         modalTitle="Onboarding Quick Start"
         docsLinkTitle={
           <>
-            <OpenInNewIcon fontSize="small" />
+            <RiExternalLinkLine size={20} />
             Learn more with getting started docs
           </>
         }
@@ -99,6 +98,6 @@ export const CustomDocLink = () => {
         }
         cardDescription="Backstage system model will help you create new entities"
       />
-    </Grid>
+    </div>
   );
 };

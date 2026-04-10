@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-import Typography from '@material-ui/core/Typography';
+import { Text } from '@backstage/ui';
 import { useRandomJoke } from './Context';
 
 export const Content = () => {
   const { joke, loading } = useRandomJoke();
 
-  if (loading) return <Typography paragraph>Loading...</Typography>;
+  if (loading) return <Text as="p">Loading...</Text>;
 
   return (
     <div>
-      <Typography paragraph>{joke.setup}</Typography>
-      <Typography paragraph>{joke.punchline}</Typography>
+      <Text as="p">{joke.setup}</Text>
+      <Text as="p">{joke.punchline}</Text>
     </div>
   );
 };

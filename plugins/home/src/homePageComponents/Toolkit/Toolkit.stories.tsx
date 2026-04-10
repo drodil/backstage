@@ -16,7 +16,6 @@
 
 import { InfoCard } from '@backstage/core-components';
 import { wrapInTestApp } from '@backstage/test-utils';
-import Grid from '@material-ui/core/Grid';
 import { ComponentType, PropsWithChildren } from 'react';
 import { ComponentAccordion } from '../../componentRenderers';
 import { HomePageToolkit } from '../../plugin';
@@ -32,7 +31,7 @@ export default {
 
 export const Default = () => {
   return (
-    <Grid item xs={12} md={6}>
+    <div style={{ maxWidth: '600px' }}>
       <HomePageToolkit
         tools={Array(8).fill({
           url: '#',
@@ -40,7 +39,7 @@ export const Default = () => {
           icon: <TemplateBackstageLogoIcon />,
         })}
       />
-    </Grid>
+    </div>
   );
 };
 
@@ -51,7 +50,7 @@ export const InAccordion = () => {
 
   return (
     <InfoCard title="Toolkit" noPadding>
-      <Grid item>
+      <div>
         <HomePageToolkit
           title="Tools 1"
           tools={Array(8).fill({
@@ -79,7 +78,7 @@ export const InAccordion = () => {
           })}
           Renderer={ComponentAccordion}
         />
-      </Grid>
+      </div>
     </InfoCard>
   );
 };

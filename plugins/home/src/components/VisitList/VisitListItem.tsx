@@ -14,20 +14,12 @@
  * limitations under the License.
  */
 
-import ListItem from '@material-ui/core/ListItem';
-import ListItemAvatar from '@material-ui/core/ListItemAvatar';
-import ListItemText from '@material-ui/core/ListItemText';
-import { makeStyles } from '@material-ui/core/styles';
 import { Visit } from '../../api/VisitsApi';
 import { ItemName } from './ItemName';
 import { ItemDetail, ItemDetailType } from './ItemDetail';
 import { ItemCategory } from './ItemCategory';
+import styles from './VisitListItem.module.css';
 
-const useStyles = makeStyles(_theme => ({
-  avatar: {
-    minWidth: 0,
-  },
-}));
 export const VisitListItem = ({
   visit,
   detailType,
@@ -35,18 +27,15 @@ export const VisitListItem = ({
   visit: Visit;
   detailType: ItemDetailType;
 }) => {
-  const classes = useStyles();
-
   return (
-    <ListItem disableGutters>
-      <ListItemAvatar className={classes.avatar}>
+    <li className={styles.item}>
+      <div className={styles.avatar}>
         <ItemCategory visit={visit} />
-      </ListItemAvatar>
-      <ListItemText
-        primary={<ItemName visit={visit} />}
-        secondary={<ItemDetail visit={visit} type={detailType} />}
-        disableTypography
-      />
-    </ListItem>
+      </div>
+      <div className={styles.content}>
+        <ItemName visit={visit} />
+        <ItemDetail visit={visit} type={detailType} />
+      </div>
+    </li>
   );
 };

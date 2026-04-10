@@ -1,0 +1,23 @@
+@layer components {
+  .iconRow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    gap: var(--bui-space-2);
+  }
+
+  .settingsOverlay {
+    position: absolute;
+    background-color: color-mix(
+      in srgb,
+      var(--bui-bg-neutral-1) 93%,
+      transparent
+    );
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    padding: var(--bui-space-4);
+  }
+}

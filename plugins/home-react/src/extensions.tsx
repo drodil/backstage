@@ -15,9 +15,15 @@
  */
 
 import { useState, Suspense } from 'react';
-import IconButton from '@material-ui/core/IconButton';
-import SettingsIcon from '@material-ui/icons/Settings';
-import { InfoCard } from '@backstage/core-components';
+import {
+  ButtonIcon,
+  Card,
+  CardHeader,
+  CardBody,
+  CardFooter,
+  Text,
+} from '@backstage/ui';
+import { RiSettingsLine } from '@remixicon/react';
 import { SettingsModal } from './components';
 import { createReactExtension, useApp } from '@backstage/core-plugin-api';
 import { RJSFSchema, UiSchema } from '@rjsf/utils';
@@ -154,29 +160,25 @@ export function CardExtension<T>(props: CardExtensionComponentProps<T>) {
     );
   }
 
-  const cardProps = {
-    divider: !!title,
-    ...(title && { title }),
-    ...(Settings && !isCustomizable
-      ? {
-          action: (
-            <IconButton onClick={() => setSettingsOpen(true)}>
-              <SettingsIcon>
-                {t('cardExtension.settingsButtonTitle')}
-              </SettingsIcon>
-            </IconButton>
-          ),
-        }
-      : {}),
-    ...(Actions
-      ? {
-          actions: <Actions />,
-        }
-      : {}),
-  };
-
   const innerContent = (
-    <InfoCard {...cardProps}>
+    <Card style={{ width: '100%', height: '100%' }}>
+      {(title || (Settings && !isCustomizable)) && (
+        <CardHeader>
+          {title && (
+            <Text as="h2" variant="title-small">
+              {title}
+            </Text>
+          )}
+          {Settings && !isCustomizable && (
+            <ButtonIcon
+              aria-label={t('cardExtension.settingsButtonTitle')}
+              variant="tertiary"
+              icon={<RiSettingsLine />}
+              onPress={() => setSettingsOpen(true)}
+            />
+          )}
+        </CardHeader>
+      )}
       {Settings && !isCustomizable && (
         <SettingsModal
           open={settingsOpen}
@@ -186,8 +188,15 @@ export function CardExtension<T>(props: CardExtensionComponentProps<T>) {
           <Settings />
         </SettingsModal>
       )}
-      <Content {...childProps} />
-    </InfoCard>
+      <CardBody>
+        <Content {...childProps} />
+      </CardBody>
+      {Actions && (
+        <CardFooter>
+          <Actions />
+        </CardFooter>
+      )}
+    </Card>
   );
 
   return (

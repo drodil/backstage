@@ -30,7 +30,7 @@ describe('<VisitList/>', () => {
       <VisitList title="My title" detailType="time-ago" loading />,
     );
     expect(container.querySelectorAll('li')).toHaveLength(8);
-    expect(container.querySelectorAll('.MuiSkeleton-root')).toHaveLength(16);
+    expect(container.querySelectorAll('.bui-Skeleton')).toHaveLength(16);
   });
 
   it('renders specified amount of items', async () => {

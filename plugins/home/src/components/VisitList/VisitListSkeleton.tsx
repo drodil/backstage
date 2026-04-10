@@ -14,37 +14,23 @@
  * limitations under the License.
  */
 
-import Collapse from '@material-ui/core/Collapse';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemAvatar from '@material-ui/core/ListItemAvatar';
-import ListItemText from '@material-ui/core/ListItemText';
-import { makeStyles } from '@material-ui/core/styles';
-import Skeleton from '@material-ui/lab/Skeleton';
+import { Skeleton } from '@backstage/ui';
+import styles from './VisitListSkeleton.module.css';
 
-const useStyles = makeStyles(_theme => ({
-  skeleton: {
-    borderRadius: 30,
-  },
-}));
-
-const VisitListItemSkeleton = () => {
-  const classes = useStyles();
-
+const VisitListItemSkeleton = ({ hidden }: { hidden?: boolean }) => {
   return (
-    <ListItem disableGutters>
-      <ListItemAvatar>
-        <Skeleton
-          className={classes.skeleton}
-          variant="rect"
-          width={50}
-          height={24}
-        />
-      </ListItemAvatar>
-      <ListItemText
-        primary={<Skeleton variant="text" width="100%" height={28} />}
-        disableTypography
-      />
-    </ListItem>
+    <li
+      className={styles.item}
+      hidden={hidden || undefined}
+      style={hidden ? { display: 'none' } : undefined}
+    >
+      <div className={styles.avatarSkeleton}>
+        <Skeleton width={50} height={24} />
+      </div>
+      <div className={styles.textSkeleton}>
+        <Skeleton width="100%" height={28} />
+      </div>
+    </li>
   );
 };
 
@@ -63,14 +49,11 @@ export const VisitListSkeleton = ({
       .map((_e, index) => (
         <VisitListItemSkeleton key={index} />
       ))}
-    {numVisitsTotal > numVisitsOpen && (
-      <Collapse in={!collapsed}>
-        {Array(numVisitsTotal - numVisitsOpen)
-          .fill(null)
-          .map((_e, index) => (
-            <VisitListItemSkeleton key={index} />
-          ))}
-      </Collapse>
-    )}
+    {numVisitsTotal > numVisitsOpen &&
+      Array(numVisitsTotal - numVisitsOpen)
+        .fill(null)
+        .map((_e, index) => (
+          <VisitListItemSkeleton key={`extra-${index}`} hidden={collapsed} />
+        ))}
   </>
 );

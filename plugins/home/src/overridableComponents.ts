@@ -14,8 +14,7 @@
  * limitations under the License.
  */
 
-import { Overrides } from '@material-ui/core/styles/overrides';
-import { StyleRules } from '@material-ui/core/styles/withStyles';
+import { CSSProperties } from 'react';
 import { FeaturedDocsCardClassKey } from './homePageComponents/FeaturedDocsCard';
 
 /** @public */
@@ -24,9 +23,9 @@ export type CatalogReactComponentsNameToClassKey = {
 };
 
 /** @public */
-export type BackstageOverrides = Overrides & {
+export type BackstageOverrides = {
   [Name in keyof CatalogReactComponentsNameToClassKey]?: Partial<
-    StyleRules<CatalogReactComponentsNameToClassKey[Name]>
+    Record<CatalogReactComponentsNameToClassKey[Name], CSSProperties>
   >;
 };
 

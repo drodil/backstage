@@ -14,28 +14,30 @@
  * limitations under the License.
  */
 
-import Typography from '@material-ui/core/Typography';
+import { Text } from '@backstage/ui';
 import { Visit } from '../../api/VisitsApi';
 import { DateTime } from 'luxon';
 
 const ItemDetailHits = ({ visit }: { visit: Visit }) => (
-  <Typography component="span" variant="caption" color="textSecondary">
+  <Text as="span" variant="body-x-small" color="secondary">
     {visit.hits} time{visit.hits > 1 ? 's' : ''}
-  </Typography>
+  </Text>
 );
 
 const ItemDetailTimeAgo = ({ visit }: { visit: Visit }) => {
   const visitDate = DateTime.fromMillis(visit.timestamp);
 
   return (
-    <Typography
-      component="time"
-      variant="caption"
-      color="textSecondary"
+    <time
+      style={{
+        fontSize: 'var(--bui-font-size-1)',
+        color: 'var(--bui-fg-secondary)',
+        lineHeight: '140%',
+      }}
       dateTime={visitDate.toISO() ?? undefined}
     >
       {visitDate.toRelative()}
-    </Typography>
+    </time>
   );
 };
 

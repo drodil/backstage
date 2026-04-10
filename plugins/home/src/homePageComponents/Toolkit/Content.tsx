@@ -15,39 +15,9 @@
  */
 
 import { Link } from '@backstage/core-components';
-import List from '@material-ui/core/List';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import ListItemText from '@material-ui/core/ListItemText';
-import { makeStyles } from '@material-ui/core/styles';
+import { Text } from '@backstage/ui';
 import { useToolkit, Tool } from './Context';
-
-const useStyles = makeStyles(theme => ({
-  toolkit: {
-    display: 'flex',
-    flexWrap: 'wrap',
-    textAlign: 'center',
-  },
-  tool: {
-    margin: theme.spacing(0.5, 1),
-  },
-  label: {
-    marginTop: theme.spacing(1),
-    width: '72px',
-    fontSize: '0.9em',
-    lineHeight: '1.25',
-    overflowWrap: 'break-word',
-    color: theme.palette.text.secondary,
-  },
-  icon: {
-    width: '64px',
-    height: '64px',
-    borderRadius: '50px',
-    justifyContent: 'center',
-    alignItems: 'center',
-    boxShadow: theme.shadows[1],
-    backgroundColor: theme.palette.background.default,
-  },
-}));
+import styles from './Content.module.css';
 
 /**
  * A component to display a list of tools for the user.
@@ -55,22 +25,22 @@ const useStyles = makeStyles(theme => ({
  * @public
  */
 export const Content = (props: ToolkitContentProps) => {
-  const classes = useStyles();
   const toolkit = useToolkit();
   const tools = toolkit?.tools ?? props.tools;
 
   return (
-    <List className={classes.toolkit}>
+    <ul className={styles.toolkit}>
       {tools.map((tool: Tool) => (
-        <Link key={tool.url} to={tool.url} className={classes.tool}>
-          <ListItemIcon className={classes.icon}>{tool.icon}</ListItemIcon>
-          <ListItemText
-            secondaryTypographyProps={{ className: classes.label }}
-            secondary={tool.label}
-          />
-        </Link>
+        <li key={tool.url}>
+          <Link to={tool.url} className={styles.tool}>
+            <div className={styles.icon}>{tool.icon}</div>
+            <Text as="span" className={styles.label}>
+              {tool.label}
+            </Text>
+          </Link>
+        </li>
       ))}
-    </List>
+    </ul>
   );
 };
 

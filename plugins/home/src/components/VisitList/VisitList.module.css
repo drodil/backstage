@@ -1,0 +1,15 @@
+@layer components {
+  .list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .collapsibleItems {
+    display: none;
+  }
+
+  .collapsibleItems.expanded {
+    display: block;
+  }
+}

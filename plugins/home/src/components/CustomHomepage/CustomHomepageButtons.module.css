@@ -1,0 +1,5 @@
+@layer components {
+  .contentHeaderBtn {
+    margin-left: var(--bui-space-4);
+  }
+}

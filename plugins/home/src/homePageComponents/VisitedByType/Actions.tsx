@@ -15,7 +15,7 @@
  */
 
 import { useCallback } from 'react';
-import Button from '@material-ui/core/Button';
+import { Button } from '@backstage/ui';
 import { useContext } from './Context';
 import { useTranslationRef } from '@backstage/frontend-plugin-api';
 import { homeTranslationRef } from '../../translation';
@@ -35,7 +35,7 @@ export const Actions = () => {
   if (!loading && visits.length <= numVisitsOpen) return <></>;
 
   return (
-    <Button variant="text" onClick={onClick}>
+    <Button variant="tertiary" onPress={onClick}>
       {label}
     </Button>
   );

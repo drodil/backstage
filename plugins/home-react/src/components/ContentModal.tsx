@@ -15,30 +15,13 @@
  */
 
 import { JSX, useState } from 'react';
-import { Link } from '@backstage/core-components';
-import Modal from '@material-ui/core/Modal';
-import Box from '@material-ui/core/Box';
-import { makeStyles, Theme } from '@material-ui/core/styles';
+import { Button, Dialog, DialogTrigger, DialogBody } from '@backstage/ui';
 
-/** @public */
+/**
+ * @public
+ * @deprecated Class-key overrides are no longer supported after migration to \@backstage/ui.
+ */
 export type PluginHomeContentModalClassKey = 'contentModal' | 'linkText';
-
-export const useStyles = makeStyles(
-  (theme: Theme) => ({
-    contentModal: {
-      position: 'absolute',
-      top: '50%',
-      left: '50%',
-      transform: 'translate(-50%, -50%)',
-      width: '80%',
-      height: 'auto',
-    },
-    linkText: {
-      marginBottom: theme.spacing(1.5),
-    },
-  }),
-  { name: 'PluginHomeContentModal' },
-);
 
 /**
  * Props customizing the <ContentModal/> component.
@@ -57,30 +40,18 @@ export type ContentModalProps = {
  */
 export const ContentModal = (props: ContentModalProps) => {
   const { modalContent, linkContent } = props;
-  const styles = useStyles();
   const [open, setOpen] = useState(false);
 
   return (
-    <div className={styles.linkText} data-testid="content-modal-container">
-      <Link
-        to="#"
-        component="button"
-        variant="h6"
-        underline="none"
-        onClick={() => setOpen(true)}
-      >
-        {linkContent}
-      </Link>
-      <Modal
-        open={open}
-        onClose={() => setOpen(false)}
-        aria-labelledby="content-modal"
-        data-testid="content-modal"
-      >
-        <Box className={styles.contentModal} data-testid="content-modal-open">
-          {modalContent}
-        </Box>
-      </Modal>
+    <div data-testid="content-modal-container">
+      <DialogTrigger isOpen={open} onOpenChange={setOpen}>
+        <Button variant="tertiary">{linkContent}</Button>
+        <Dialog isDismissable aria-label="Content" data-testid="content-modal">
+          <DialogBody data-testid="content-modal-open">
+            {modalContent}
+          </DialogBody>
+        </Dialog>
+      </DialogTrigger>
     </div>
   );
 };

@@ -15,8 +15,7 @@
  */
 
 import { useState } from 'react';
-import Tabs from '@material-ui/core/Tabs';
-import Tab from '@material-ui/core/Tab';
+import { Tabs, TabList, Tab, TabPanel } from '@backstage/ui';
 import { InfoCard } from '@backstage/core-components';
 
 type TabType = {
@@ -26,28 +25,28 @@ type TabType = {
 
 export const ComponentTabs = (props: { title: string; tabs: TabType[] }) => {
   const { title, tabs } = props;
-
-  const [value, setValue] = useState(0);
-
-  const handleChange = (_event: any, newValue: number) => {
-    setValue(newValue);
-  };
+  const defaultKey = tabs[0]?.label ?? '';
+  const [selectedKey, setSelectedKey] = useState(defaultKey);
 
   return (
     <InfoCard title={title}>
-      <Tabs value={value} onChange={handleChange}>
+      <Tabs
+        selectedKey={selectedKey}
+        onSelectionChange={key => setSelectedKey(key as string)}
+      >
+        <TabList>
+          {tabs.map(t => (
+            <Tab key={t.label} id={t.label}>
+              {t.label}
+            </Tab>
+          ))}
+        </TabList>
         {tabs.map(t => (
-          <Tab key={t.label} label={t.label} />
+          <TabPanel key={t.label} id={t.label}>
+            <t.Component />
+          </TabPanel>
         ))}
       </Tabs>
-      {tabs.map(({ Component }, idx) => (
-        <div
-          key={idx}
-          {...(idx !== value ? { style: { display: 'none' } } : {})}
-        >
-          <Component />
-        </div>
-      ))}
     </InfoCard>
   );
 };

@@ -19,7 +19,6 @@ import { ComponentType, PropsWithChildren } from 'react';
 import { wrapInTestApp, TestApiProvider } from '@backstage/test-utils';
 import { catalogApiRef, entityRouteRef } from '@backstage/plugin-catalog-react';
 import { catalogApiMock } from '@backstage/plugin-catalog-react/testUtils';
-import Grid from '@material-ui/core/Grid';
 
 const docsEntities = [
   {
@@ -59,13 +58,13 @@ export default {
 
 export const Default = () => {
   return (
-    <Grid item xs={12} md={6}>
+    <div style={{ maxWidth: '600px' }}>
       <FeaturedDocsCard
         filter={{
           'spec.type': 'documentation',
           'metadata.name': 'getting-started-with-backstage',
         }}
       />
-    </Grid>
+    </div>
   );
 };

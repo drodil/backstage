@@ -33,8 +33,8 @@ type RandomJokeContextValue = {
   loading: boolean;
   joke: Joke;
   type: JokeType;
-  rerollJoke: Function;
-  handleChangeType: Function;
+  rerollJoke: () => void;
+  handleChangeType: (value: string) => void;
 };
 
 const Context = createContext<RandomJokeContextValue | undefined>(undefined);
@@ -68,8 +68,8 @@ export const ContextProvider = (props: {
     getNewJoke(type).then(newJoke => setJoke(newJoke));
   }, [type]);
 
-  const handleChangeType = (newType: JokeType) => {
-    setType(newType);
+  const handleChangeType = (newType: string) => {
+    setType(newType as JokeType);
   };
 
   useEffect(() => {

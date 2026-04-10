@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import Typography from '@material-ui/core/Typography';
+import { Text } from '@backstage/ui';
 import { configApiRef, useApi } from '@backstage/core-plugin-api';
 import { ReactNode } from 'react';
 
@@ -36,7 +36,9 @@ export const CompanyLogo = (props: CompanyLogoProps) => {
       {logo ? (
         <>{logo}</>
       ) : (
-        <Typography variant="h1">{configApi.getString('app.title')}</Typography>
+        <Text as="h1" variant="title-large">
+          {configApi.getString('app.title')}
+        </Text>
       )}
     </div>
   );

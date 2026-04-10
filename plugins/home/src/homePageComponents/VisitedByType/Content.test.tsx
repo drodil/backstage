@@ -100,7 +100,7 @@ describe('<Content kind="recent"/>', () => {
         </ContextProvider>
       </TestApiProvider>,
     );
-    expect(container.querySelector('.MuiSkeleton-root')).toBeInTheDocument();
+    expect(container.querySelector('.bui-Skeleton')).toBeInTheDocument();
   });
 
   it('allows number of items to be specified', async () => {
