@@ -42,6 +42,7 @@ import { AuthorizedValidationService } from './AuthorizedValidationService';
 import {
   basicEntityFilter,
   entitiesBatchRequest,
+  parseEntityFieldPaths,
   parseEntityFilterParams,
   parseEntityTransformParams,
   parseQueryEntitiesParams,
@@ -169,6 +170,7 @@ export async function createRouter(
         try {
           const filter = parseEntityFilterParams(req.query);
           const fields = parseEntityTransformParams(req.query);
+          const fieldPaths = parseEntityFieldPaths(req.query);
           const order = parseEntityOrderParams(req.query);
           const pagination = parseEntityPaginationParams(req.query);
           const credentials = await httpAuth.credentials(req);
@@ -180,6 +182,7 @@ export async function createRouter(
             const { entities, pageInfo } = await entitiesCatalog.entities({
               filter,
               fields,
+              fieldPaths,
               order,
               pagination,
               credentials,
@@ -207,7 +210,7 @@ export async function createRouter(
           }
 
           const responseStream = createEntityArrayJsonStream(res);
-          const limit = 10000;
+          const limit = fieldPaths?.length ? 20000 : 10000;
           let cursor: Cursor | undefined;
 
           try {
@@ -218,12 +221,13 @@ export async function createRouter(
                   ? {
                       credentials,
                       fields,
+                      fieldPaths,
                       limit,
                       filter,
                       orderFields: order,
                       skipTotalItems: true,
                     }
-                  : { credentials, fields, limit, cursor },
+                  : { credentials, fields, fieldPaths, limit, cursor },
               );
 
               // Wait for previous write to complete
@@ -271,11 +275,15 @@ export async function createRouter(
           const fields = rawFields?.length
             ? parseEntityTransformParams({ fields: rawFields })
             : undefined;
+          const fieldPaths = rawFields?.length
+            ? parseEntityFieldPaths({ fields: rawFields })
+            : undefined;
 
           const { items, pageInfo, totalItems } =
             await entitiesCatalog.queryEntities({
               credentials,
               fields,
+              fieldPaths,
               ...parsed,
             });
 
@@ -521,6 +529,7 @@ export async function createRouter(
             filter: parseEntityFilterParams(req.query),
             query: request.query,
             fields: parseEntityTransformParams(req.query, request.fields),
+            fieldPaths: parseEntityFieldPaths(req.query, request.fields),
             credentials: await httpAuth.credentials(req),
           });
 

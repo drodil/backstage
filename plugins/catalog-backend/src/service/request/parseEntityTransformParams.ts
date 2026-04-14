@@ -76,3 +76,39 @@ export function parseEntityTransformParams(
     return output as Entity;
   };
 }
+
+/**
+ * Parses the `fields` query parameter into a plain string array suitable for
+ * passing as `fieldPaths` to catalog methods that support DB-side field
+ * projection.
+ *
+ * Returns `undefined` when no fields are requested (no projection needed).
+ */
+export function parseEntityFieldPaths(
+  params: Record<string, unknown>,
+  extra?: string[],
+): string[] | undefined {
+  const queryFields = parseStringsParam(params.fields, 'fields');
+
+  const fields = Array.from(
+    new Set(
+      [...(extra ?? []), ...(queryFields?.map(s => s.split(',')) ?? [])]
+        .flat()
+        .map(s => s.trim())
+        .filter(Boolean),
+    ),
+  );
+
+  if (!fields.length) {
+    return undefined;
+  }
+
+  const arrayTypeField = fields.find(f => f.includes('['));
+  if (arrayTypeField) {
+    throw new InputError(
+      `Invalid field "${arrayTypeField}", array type fields are not supported`,
+    );
+  }
+
+  return fields;
+}

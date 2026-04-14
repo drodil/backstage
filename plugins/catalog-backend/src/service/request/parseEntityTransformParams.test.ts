@@ -15,7 +15,10 @@
  */
 
 import { Entity } from '@backstage/catalog-model';
-import { parseEntityTransformParams } from './parseEntityTransformParams';
+import {
+  parseEntityFieldPaths,
+  parseEntityTransformParams,
+} from './parseEntityTransformParams';
 
 describe('parseEntityTransformParams', () => {
   let entity: Entity;
@@ -196,5 +199,68 @@ describe('parseEntityTransformParams', () => {
         name: 'n',
       },
     });
+  });
+});
+
+describe('parseEntityFieldPaths', () => {
+  it('returns undefined when no fields given', () => {
+    expect(parseEntityFieldPaths({})).toBeUndefined();
+    expect(parseEntityFieldPaths({ fields: '' })).toBeUndefined();
+    expect(parseEntityFieldPaths({ fields: [] })).toBeUndefined();
+  });
+
+  it('rejects array-style selectors with the same error as parseEntityTransformParams', () => {
+    expect(() => parseEntityFieldPaths({ fields: 'metadata.tags[0]' })).toThrow(
+      'Invalid field "metadata.tags[0]", array type fields are not supported',
+    );
+  });
+
+  it('returns a deduplicated flat array of field paths', () => {
+    expect(parseEntityFieldPaths({ fields: 'kind,metadata.name' })).toEqual([
+      'kind',
+      'metadata.name',
+    ]);
+    expect(
+      parseEntityFieldPaths({ fields: ['kind', 'metadata.name', 'kind'] }),
+    ).toEqual(['kind', 'metadata.name']);
+  });
+
+  it('merges extras with query params', () => {
+    expect(
+      parseEntityFieldPaths({ fields: 'kind' }, ['metadata.name']),
+    ).toEqual(['metadata.name', 'kind']);
+  });
+
+  it('includes annotation-style paths containing /', () => {
+    // These paths are returned as-is; buildJsonFieldProjection will detect '/'
+    // and fall back to JS-side projection rather than SQL.
+    const paths = parseEntityFieldPaths({
+      fields: 'metadata.annotations.backstage.io/techdocs-ref',
+    });
+    expect(paths).toEqual(['metadata.annotations.backstage.io/techdocs-ref']);
+  });
+
+  it('trims whitespace around field names', () => {
+    expect(parseEntityFieldPaths({ fields: ' kind , metadata.name ' })).toEqual(
+      ['kind', 'metadata.name'],
+    );
+  });
+
+  it('filters out empty strings in an array', () => {
+    expect(
+      parseEntityFieldPaths({ fields: ['kind', '', 'metadata.name'] }),
+    ).toEqual(['kind', 'metadata.name']);
+  });
+
+  it('returns undefined when fields contains only empty or whitespace values', () => {
+    expect(parseEntityFieldPaths({ fields: [','] })).toBeUndefined();
+    expect(parseEntityFieldPaths({ fields: ['', ''] })).toBeUndefined();
+    expect(parseEntityFieldPaths({ fields: '  ' })).toBeUndefined();
+  });
+
+  it('deduplicates across extras and query params', () => {
+    expect(
+      parseEntityFieldPaths({ fields: 'kind,metadata.name' }, ['kind']),
+    ).toEqual(['kind', 'metadata.name']);
   });
 });

@@ -484,6 +484,7 @@ subroute
 subroutes
 substring
 subtree
+subquery
 superfences
 Superfences
 superset

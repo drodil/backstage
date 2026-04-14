@@ -22,19 +22,24 @@ import {
 import { decodeCursor } from '../util';
 import { parseEntityFilterParams } from './parseEntityFilterParams';
 import { parseEntityOrderFieldParams } from './parseEntityOrderFieldParams';
-import { parseEntityTransformParams } from './parseEntityTransformParams';
+import {
+  parseEntityFieldPaths,
+  parseEntityTransformParams,
+} from './parseEntityTransformParams';
 import { GetEntitiesByQuery } from '../../schema/openapi';
 
 export function parseQueryEntitiesParams(
   params: GetEntitiesByQuery['query'],
 ): Omit<QueryEntitiesRequest, 'credentials' | 'limit'> {
   const fields = parseEntityTransformParams(params);
+  const fieldPaths = parseEntityFieldPaths(params);
 
   if (params.cursor) {
     const decodedCursor = decodeCursor(params.cursor);
     const response: Omit<QueryEntitiesCursorRequest, 'credentials'> = {
       cursor: decodedCursor,
       fields,
+      fieldPaths,
     };
     return response;
   }
@@ -44,6 +49,7 @@ export function parseQueryEntitiesParams(
 
   const response: Omit<QueryEntitiesInitialRequest, 'credentials'> = {
     fields,
+    fieldPaths,
     filter,
     orderFields,
     fullTextFilter: {

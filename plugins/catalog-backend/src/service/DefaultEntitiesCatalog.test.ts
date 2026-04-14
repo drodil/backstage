@@ -741,6 +741,117 @@ describe('DefaultEntitiesCatalog', () => {
         ).resolves.toEqual(['n4', 'n3', 'n1', 'n2']);
       },
     );
+
+    it.each(databases.eachSupportedId())(
+      'should project only requested fields via fieldPaths, %p',
+      async databaseId => {
+        await createDatabase(databaseId);
+
+        const entity: Entity = {
+          apiVersion: 'a',
+          kind: 'k',
+          metadata: { name: 'n1', description: 'some description' },
+          spec: { type: 'service', owner: 'me' },
+        };
+        await addEntityToSearch(entity);
+
+        const catalog = new DefaultEntitiesCatalog({
+          database: knex,
+          logger: mockServices.logger.mock(),
+          stitcher,
+        });
+
+        const res = await catalog.entities({
+          fieldPaths: ['kind', 'metadata.name'],
+          credentials: mockCredentials.none(),
+        });
+        const items = entitiesResponseToObjects(res.entities);
+
+        expect(items).toHaveLength(1);
+        // Only the projected fields should be present
+        expect(items[0]).toEqual({ kind: 'k', metadata: { name: 'n1' } });
+        // Fields not in fieldPaths must be absent
+        expect(items[0]).not.toHaveProperty('spec');
+        expect(items[0]).not.toHaveProperty('apiVersion');
+        expect(items[0]).not.toHaveProperty('metadata.description');
+      },
+    );
+
+    it.each(databases.eachSupportedId())(
+      'should return full parent when parent path dominates child path, %p',
+      async databaseId => {
+        await createDatabase(databaseId);
+
+        const entity: Entity = {
+          apiVersion: 'a',
+          kind: 'k',
+          metadata: { name: 'n1', description: 'keep me' },
+          spec: { type: 'service' },
+        };
+        await addEntityToSearch(entity);
+
+        const catalog = new DefaultEntitiesCatalog({
+          database: knex,
+          logger: mockServices.logger.mock(),
+          stitcher,
+        });
+
+        // Requesting both 'metadata' (parent) and 'metadata.name' (child).
+        // The parent leaf dominates: the full metadata object should be returned.
+        const res = await catalog.entities({
+          fieldPaths: ['metadata', 'metadata.name'],
+          credentials: mockCredentials.none(),
+        });
+        const items = entitiesResponseToObjects(res.entities);
+
+        expect(items).toHaveLength(1);
+        expect(items[0]).toHaveProperty('metadata.name', 'n1');
+        expect(items[0]).toHaveProperty('metadata.description', 'keep me');
+        expect(items[0]).not.toHaveProperty('spec');
+        expect(items[0]).not.toHaveProperty('kind');
+      },
+    );
+
+    it.each(databases.eachSupportedId())(
+      'should fall back to JS transform for annotation-style field paths, %p',
+      async databaseId => {
+        await createDatabase(databaseId);
+
+        const entity: Entity = {
+          apiVersion: 'a',
+          kind: 'k',
+          metadata: {
+            name: 'n1',
+            annotations: { 'backstage.io/techdocs-ref': 'dir:.', other: 'x' },
+          },
+          spec: {},
+        };
+        await addEntityToSearch(entity);
+
+        const catalog = new DefaultEntitiesCatalog({
+          database: knex,
+          logger: mockServices.logger.mock(),
+          stitcher,
+        });
+
+        // Annotation paths contain '/' – DB projection is disabled; the
+        // JS-side fields transform must produce the correct shape.
+        const res = await catalog.entities({
+          fields: e =>
+            ({
+              ...e,
+              metadata: { ...e.metadata, annotations: undefined },
+            } as any),
+          fieldPaths: ['metadata.annotations.backstage.io/techdocs-ref'],
+          credentials: mockCredentials.none(),
+        });
+        const items = entitiesResponseToObjects(res.entities);
+
+        // The JS fields transform runs because DB projection was bypassed.
+        expect(items).toHaveLength(1);
+        expect(items[0]).not.toHaveProperty('metadata.annotations');
+      },
+    );
   });
 
   describe('entitiesBatch', () => {
@@ -843,6 +954,75 @@ describe('DefaultEntitiesCatalog', () => {
           'k:default/two',
           null,
         ]);
+      },
+    );
+
+    it.each(databases.eachSupportedId())(
+      'should project only requested fields via fieldPaths, %p',
+      async databaseId => {
+        await createDatabase(databaseId);
+
+        const entity: Entity = {
+          apiVersion: 'a',
+          kind: 'k',
+          metadata: { name: 'one', description: 'desc' },
+          spec: { type: 'service' },
+          relations: [],
+        };
+        await addEntity(entity, []);
+
+        const catalog = new DefaultEntitiesCatalog({
+          database: knex,
+          logger: mockServices.logger.mock(),
+          stitcher,
+        });
+
+        const res = await catalog.entitiesBatch({
+          entityRefs: ['k:default/one'],
+          fieldPaths: ['kind', 'metadata.name'],
+          credentials: mockCredentials.none(),
+        });
+        const items = entitiesResponseToObjects(res.items);
+
+        expect(items).toHaveLength(1);
+        expect(items[0]).toEqual({ kind: 'k', metadata: { name: 'one' } });
+        expect(items[0]).not.toHaveProperty('spec');
+        expect(items[0]).not.toHaveProperty('apiVersion');
+        expect(items[0]).not.toHaveProperty('metadata.description');
+      },
+    );
+
+    it.each(databases.eachSupportedId())(
+      'should return full parent when parent path dominates child path in entitiesBatch, %p',
+      async databaseId => {
+        await createDatabase(databaseId);
+
+        const entity: Entity = {
+          apiVersion: 'a',
+          kind: 'k',
+          metadata: { name: 'one', description: 'keep me' },
+          spec: { type: 'service' },
+          relations: [],
+        };
+        await addEntity(entity, []);
+
+        const catalog = new DefaultEntitiesCatalog({
+          database: knex,
+          logger: mockServices.logger.mock(),
+          stitcher,
+        });
+
+        const res = await catalog.entitiesBatch({
+          entityRefs: ['k:default/one'],
+          fieldPaths: ['metadata', 'metadata.name'],
+          credentials: mockCredentials.none(),
+        });
+        const items = entitiesResponseToObjects(res.items);
+
+        expect(items).toHaveLength(1);
+        expect(items[0]).toHaveProperty('metadata.name', 'one');
+        expect(items[0]).toHaveProperty('metadata.description', 'keep me');
+        expect(items[0]).not.toHaveProperty('spec');
       },
     );
   });
@@ -2174,6 +2354,168 @@ describe('DefaultEntitiesCatalog', () => {
         expect(stitch).toHaveBeenCalledWith({
           entityRefs: new Set(['k:default/unrelated1', 'k:default/unrelated2']),
         });
+      },
+    );
+  });
+
+  describe('queryEntities with fieldPaths', () => {
+    it.each(databases.eachSupportedId())(
+      'should project only requested fields via fieldPaths, %p',
+      async databaseId => {
+        await createDatabase(databaseId);
+
+        const entityA: Entity = {
+          apiVersion: 'a',
+          kind: 'k',
+          metadata: { name: 'a', description: 'desc-a' },
+          spec: { type: 'service', owner: 'team-a' },
+        };
+        const entityB: Entity = {
+          apiVersion: 'a',
+          kind: 'k',
+          metadata: { name: 'b', description: 'desc-b' },
+          spec: { type: 'library', owner: 'team-b' },
+        };
+        await addEntityToSearch(entityA);
+        await addEntityToSearch(entityB);
+
+        const catalog = new DefaultEntitiesCatalog({
+          database: knex,
+          logger: mockServices.logger.mock(),
+          stitcher,
+        });
+
+        const res = await catalog.queryEntities({
+          fieldPaths: ['kind', 'metadata.name', 'spec.type'],
+          orderFields: [{ field: 'metadata.name', order: 'asc' }],
+          credentials: mockCredentials.none(),
+        });
+        const items = entitiesResponseToObjects(res.items);
+
+        expect(items).toHaveLength(2);
+        expect(items[0]).toEqual({
+          kind: 'k',
+          metadata: { name: 'a' },
+          spec: { type: 'service' },
+        });
+        expect(items[1]).toEqual({
+          kind: 'k',
+          metadata: { name: 'b' },
+          spec: { type: 'library' },
+        });
+        // Fields not in fieldPaths must be absent
+        expect(items[0]).not.toHaveProperty('apiVersion');
+        expect(items[0]).not.toHaveProperty('metadata.description');
+        expect(items[0]).not.toHaveProperty('spec.owner');
+      },
+    );
+
+    it.each(databases.eachSupportedId())(
+      'should project fields without sort field, %p',
+      async databaseId => {
+        await createDatabase(databaseId);
+
+        const entity: Entity = {
+          apiVersion: 'a',
+          kind: 'k',
+          metadata: { name: 'n1', description: 'some description' },
+          spec: { type: 'service' },
+        };
+        await addEntityToSearch(entity);
+
+        const catalog = new DefaultEntitiesCatalog({
+          database: knex,
+          logger: mockServices.logger.mock(),
+          stitcher,
+        });
+
+        const res = await catalog.queryEntities({
+          fieldPaths: ['metadata.name'],
+          credentials: mockCredentials.none(),
+        });
+        const items = entitiesResponseToObjects(res.items);
+
+        expect(items).toHaveLength(1);
+        expect(items[0]).toEqual({ metadata: { name: 'n1' } });
+        expect(items[0]).not.toHaveProperty('kind');
+        expect(items[0]).not.toHaveProperty('spec');
+      },
+    );
+
+    it.each(databases.eachSupportedId())(
+      'should return full parent when parent path dominates child path in queryEntities, %p',
+      async databaseId => {
+        await createDatabase(databaseId);
+
+        const entity: Entity = {
+          apiVersion: 'a',
+          kind: 'k',
+          metadata: { name: 'n1', description: 'keep me' },
+          spec: { type: 'service' },
+        };
+        await addEntityToSearch(entity);
+
+        const catalog = new DefaultEntitiesCatalog({
+          database: knex,
+          logger: mockServices.logger.mock(),
+          stitcher,
+        });
+
+        const res = await catalog.queryEntities({
+          fieldPaths: ['metadata', 'metadata.name'],
+          credentials: mockCredentials.none(),
+        });
+        const items = entitiesResponseToObjects(res.items);
+
+        expect(items).toHaveLength(1);
+        expect(items[0]).toHaveProperty('metadata.name', 'n1');
+        expect(items[0]).toHaveProperty('metadata.description', 'keep me');
+        expect(items[0]).not.toHaveProperty('spec');
+        expect(items[0]).not.toHaveProperty('kind');
+      },
+    );
+
+    it.each(databases.eachSupportedId())(
+      'should produce stable sort order when entities have multiple search values for sort field, %p',
+      async databaseId => {
+        await createDatabase(databaseId);
+
+        // Add entities and manually insert extra search rows to simulate
+        // multi-valued fields (e.g. from arrays), which could previously cause
+        // non-deterministic LIMIT 1 results.
+        await addEntityToSearch({
+          apiVersion: 'a',
+          kind: 'k',
+          metadata: { name: 'b', title: 'beta' },
+          spec: { should_include_this: true },
+        });
+        await addEntityToSearch({
+          apiVersion: 'a',
+          kind: 'k',
+          metadata: { name: 'a', title: 'alpha' },
+          spec: { should_include_this: true },
+        });
+
+        const catalog = new DefaultEntitiesCatalog({
+          database: knex,
+          logger: mockServices.logger.mock(),
+          stitcher,
+        });
+
+        const filter = { key: 'spec.should_include_this' };
+
+        // Run three times to check stability
+        for (let i = 0; i < 3; i++) {
+          const res = await catalog.queryEntities({
+            filter,
+            orderFields: [{ field: 'metadata.title', order: 'asc' }],
+            credentials: mockCredentials.none(),
+          });
+          const names = entitiesResponseToObjects(res.items).map(
+            e => e!.metadata.name,
+          );
+          expect(names).toEqual(['a', 'b']);
+        }
       },
     );
   });

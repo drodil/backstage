@@ -48,6 +48,15 @@ export type PageInfo =
 export type EntitiesRequest = {
   filter?: EntityFilter;
   fields?: (entity: Entity) => Entity;
+  /**
+   * When provided, the catalog will project only these dot-separated field
+   * paths directly in the database query instead of fetching full entity blobs
+   * and filtering them in JavaScript. This significantly reduces data transfer
+   * and CPU cost for large result sets.
+   *
+   * Example: ['kind', 'metadata.name', 'spec.type']
+   */
+  fieldPaths?: string[];
   order?: EntityOrder[];
   pagination?: EntityPagination;
   credentials: BackstageCredentials;
@@ -94,6 +103,14 @@ export interface EntitiesBatchRequest {
    * Strips out only the parts of the entity bodies to include in the response.
    */
   fields?: (entity: Entity) => Entity;
+  /**
+   * When provided, the catalog will project only these dot-separated field
+   * paths directly in the database query instead of fetching full entity blobs
+   * and filtering them in JavaScript.
+   *
+   * Example: ['kind', 'metadata.name', 'spec.type']
+   */
+  fieldPaths?: string[];
   /**
    * The credentials that authorizes the action.
    */
@@ -218,6 +235,15 @@ export type QueryEntitiesRequest =
 export interface QueryEntitiesInitialRequest {
   credentials: BackstageCredentials;
   fields?: (entity: Entity) => Entity;
+  /**
+   * When provided, the catalog will project only these dot-separated field
+   * paths directly in the database query instead of fetching full entity blobs
+   * and filtering them in JavaScript. This significantly reduces data transfer
+   * and CPU cost for large result sets.
+   *
+   * Example: ['kind', 'metadata.name', 'spec.type']
+   */
+  fieldPaths?: string[];
   limit?: number;
   offset?: number;
   filter?: EntityFilter;
@@ -240,6 +266,15 @@ export interface QueryEntitiesInitialRequest {
 export interface QueryEntitiesCursorRequest {
   credentials: BackstageCredentials;
   fields?: (entity: Entity) => Entity;
+  /**
+   * When provided, the catalog will project only these dot-separated field
+   * paths directly in the database query instead of fetching full entity blobs
+   * and filtering them in JavaScript. This significantly reduces data transfer
+   * and CPU cost for large result sets.
+   *
+   * Example: ['kind', 'metadata.name', 'spec.type']
+   */
+  fieldPaths?: string[];
   limit?: number;
   cursor: Cursor;
 }

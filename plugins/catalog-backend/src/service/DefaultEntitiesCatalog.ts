@@ -41,6 +41,7 @@ import {
   DbRelationsRow,
   DbSearchRow,
 } from '../database/tables';
+import { buildJsonFieldProjection } from '../database/buildJsonFieldProjection';
 import { Stitcher } from '../stitching/types';
 
 import {
@@ -123,8 +124,26 @@ export class DefaultEntitiesCatalog implements EntitiesCatalog {
     const db = this.database;
     const { limit, offset } = parsePagination(request?.pagination);
 
-    let entitiesQuery =
-      db<DbFinalEntitiesRow>('final_entities').select('final_entities.*');
+    // When fieldPaths are provided (and we're not in legacy relations compat mode
+    // which requires a JS-side entity transform), project only the requested
+    // fields directly in the database to avoid transferring and parsing full
+    // entity blobs.
+    const fieldProjection =
+      !this.enableRelationsCompatibility && request?.fieldPaths
+        ? buildJsonFieldProjection(
+            db,
+            request.fieldPaths,
+            'final_entities',
+            'final_entity',
+          )
+        : null;
+
+    let entitiesQuery = fieldProjection
+      ? db<DbFinalEntitiesRow>('final_entities')
+          .select('final_entities.entity_id')
+          .select('final_entities.entity_ref')
+          .select({ final_entity: fieldProjection })
+      : db<DbFinalEntitiesRow>('final_entities').select('final_entities.*');
 
     request?.order?.forEach(({ field }, index) => {
       const alias = `order_${index}`;
@@ -194,18 +213,25 @@ export class DefaultEntitiesCatalog implements EntitiesCatalog {
       };
     }
 
+    let entityTransform: ((entity: Entity) => Entity) | undefined;
+    if (!fieldProjection) {
+      if (this.enableRelationsCompatibility) {
+        entityTransform = e => {
+          expandLegacyCompoundRelationsInEntity(e);
+          if (request?.fields) {
+            return request.fields(e);
+          }
+          return e;
+        };
+      } else {
+        entityTransform = request?.fields;
+      }
+    }
+
     return {
       entities: processRawEntitiesResult(
         rows.map(r => r.final_entity!),
-        this.enableRelationsCompatibility
-          ? e => {
-              expandLegacyCompoundRelationsInEntity(e);
-              if (request?.fields) {
-                return request.fields(e);
-              }
-              return e;
-            }
-          : request?.fields,
+        entityTransform,
       ),
       pageInfo,
     };
@@ -214,13 +240,22 @@ export class DefaultEntitiesCatalog implements EntitiesCatalog {
   async entitiesBatch(
     request: EntitiesBatchRequest,
   ): Promise<EntitiesBatchResponse> {
+    const fieldProjection = request.fieldPaths
+      ? buildJsonFieldProjection(
+          this.database,
+          request.fieldPaths,
+          'final_entities',
+          'final_entity',
+        )
+      : null;
+
     const lookup = new Map<string, string>();
 
     for (const chunk of lodashChunk(request.entityRefs, 200)) {
       let query = this.database<DbFinalEntitiesRow>('final_entities')
         .select({
           entityRef: 'final_entities.entity_ref',
-          entity: 'final_entities.final_entity',
+          entity: fieldProjection ?? 'final_entities.final_entity',
         })
         .whereIn('final_entities.entity_ref', chunk);
 
@@ -241,7 +276,12 @@ export class DefaultEntitiesCatalog implements EntitiesCatalog {
 
     const items = request.entityRefs.map(ref => lookup.get(ref) ?? null);
 
-    return { items: processRawEntitiesResult(items, request.fields) };
+    return {
+      items: processRawEntitiesResult(
+        items,
+        fieldProjection ? undefined : request.fields,
+      ),
+    };
   }
 
   async queryEntities(
@@ -272,6 +312,17 @@ export class DefaultEntitiesCatalog implements EntitiesCatalog {
 
     const sortField = cursor.orderFields.at(0);
 
+    // When fieldPaths are provided, project only the requested fields directly
+    // in the database CTE to avoid transferring and parsing full entity blobs.
+    const fieldProjection = request.fieldPaths
+      ? buildJsonFieldProjection(
+          this.database,
+          request.fieldPaths,
+          'final_entities',
+          'final_entity',
+        )
+      : null;
+
     // The first part of the query builder is a subquery that applies all of the
     // filtering.
     const dbQuery = this.database.with(
@@ -283,22 +334,26 @@ export class DefaultEntitiesCatalog implements EntitiesCatalog {
           .whereNotNull('final_entity');
 
         if (sortField) {
-          inner
-            .distinct()
-            .leftOuterJoin('search', qb =>
-              qb
-                .on('search.entity_id', 'final_entities.entity_id')
-                .andOnVal('search.key', sortField.field),
-            )
-            .select({
-              entity_id: 'final_entities.entity_id',
-              final_entity: 'final_entities.final_entity',
-              value: 'search.value',
-            });
+          // Use a correlated aggregate scalar subquery instead of LEFT OUTER
+          // JOIN + DISTINCT. MIN() produces a deterministic representative
+          // value even when the search table has multiple rows per
+          // (entity_id, key) (e.g. multi-valued fields or arrays), ensuring
+          // stable cursor pagination across pages.
+          inner.select({
+            entity_id: 'final_entities.entity_id',
+            final_entity: fieldProjection ?? 'final_entities.final_entity',
+            value: this.database<DbSearchRow>('search')
+              .select(this.database.raw('MIN(value)'))
+              .where(
+                'search.entity_id',
+                this.database.ref('final_entities.entity_id'),
+              )
+              .andWhere('search.key', sortField.field),
+          });
         } else {
           inner.select({
             entity_id: 'final_entities.entity_id',
-            final_entity: 'final_entities.final_entity',
+            final_entity: fieldProjection ?? 'final_entities.final_entity',
           });
         }
 
@@ -320,34 +375,19 @@ export class DefaultEntitiesCatalog implements EntitiesCatalog {
           sortField?.field || 'metadata.uid',
         ];
         if (normalizedFullTextFilterTerm) {
-          if (
-            textFilterFields.length === 1 &&
-            textFilterFields[0] === sortField?.field
-          ) {
-            // If there is one item, apply the like query to the top level query which is already
-            //   filtered based on the singular sortField.
-            inner.andWhereRaw(
-              'search.value like ?',
-              `%${normalizedFullTextFilterTerm.toLocaleLowerCase('en-US')}%`,
-            );
-          } else {
-            const matchQuery = this.database<DbSearchRow>('search')
-              .select('search.entity_id')
-              // textFilterFields must be lowercased to match searchable keys in database, i.e. spec.profile.displayName -> spec.profile.displayname
-              .whereIn(
-                'search.key',
-                textFilterFields.map(field => field.toLocaleLowerCase('en-US')),
-              )
-              .andWhere(function keyFilter() {
-                this.andWhereRaw(
-                  'search.value like ?',
-                  `%${normalizedFullTextFilterTerm.toLocaleLowerCase(
-                    'en-US',
-                  )}%`,
-                );
-              });
-            inner.andWhere('final_entities.entity_id', 'in', matchQuery);
-          }
+          const matchQuery = this.database<DbSearchRow>('search')
+            .select('search.entity_id')
+            .whereIn(
+              'search.key',
+              textFilterFields.map(field => field.toLocaleLowerCase('en-US')),
+            )
+            .andWhere(function keyFilter() {
+              this.andWhereRaw(
+                'search.value like ?',
+                `%${normalizedFullTextFilterTerm.toLocaleLowerCase('en-US')}%`,
+              );
+            });
+          inner.andWhere('final_entities.entity_id', 'in', matchQuery);
         }
       },
     );
@@ -514,7 +554,7 @@ export class DefaultEntitiesCatalog implements EntitiesCatalog {
     return {
       items: processRawEntitiesResult(
         rows.map(r => r.final_entity!),
-        request.fields,
+        fieldProjection ? undefined : request.fields,
       ),
       pageInfo: {
         ...(!!prevCursor && { prevCursor }),

@@ -710,6 +710,8 @@ describe('createRouter readonly disabled', () => {
       expect(entitiesCatalog.entitiesBatch).toHaveBeenCalledWith({
         entityRefs: [entityRef],
         fields: expect.any(Function),
+        fieldPaths: ['metadata.name'],
+        query: undefined,
         credentials: mockCredentials.user(),
         filter: { key: 'kind', values: ['Component'] },
       });
