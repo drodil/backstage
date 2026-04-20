@@ -1174,4 +1174,74 @@ describe('migrations', () => {
       await knex.destroy();
     },
   );
+
+  it.each(databases.eachSupportedId())(
+    '20260420000000_search_facets_covering_index.js, %p',
+    async databaseId => {
+      const knex = await databases.init(databaseId);
+
+      await migrateUntilBefore(
+        knex,
+        '20260420000000_search_facets_covering_index.js',
+      );
+
+      // Insert parent rows required by the search table FK chain
+      await knex('refresh_state').insert({
+        entity_id: 'e1',
+        entity_ref: 'component:default/test',
+        unprocessed_entity: '{}',
+        errors: '[]',
+        next_update_at: new Date(),
+        last_discovery_at: new Date(),
+      });
+      await knex('final_entities').insert({
+        entity_id: 'e1',
+        entity_ref: 'component:default/test',
+        hash: 'h1',
+        final_entity: '{}',
+      });
+      await knex('search').insert([
+        {
+          entity_id: 'e1',
+          key: 'kind',
+          value: 'component',
+          original_value: 'Component',
+        },
+        {
+          entity_id: 'e1',
+          key: 'spec.type',
+          value: 'service',
+          original_value: 'service',
+        },
+      ]);
+
+      // The facets-style query must return correct results before and after the migration
+      const runFacetsQuery = () =>
+        knex('search')
+          .whereIn('key', ['kind'])
+          .whereNotNull('original_value')
+          .select({
+            facet: 'key',
+            value: 'original_value',
+            count: knex.raw('count(DISTINCT entity_id)'),
+          })
+          .groupBy(['key', 'original_value']);
+
+      const before = await runFacetsQuery();
+      expect(before).toHaveLength(1);
+      expect(String(before[0].value)).toBe('Component');
+      expect(Number(before[0].count)).toBe(1);
+
+      await migrateUpOnce(knex);
+
+      const after = await runFacetsQuery();
+      expect(after).toHaveLength(1);
+      expect(String(after[0].value)).toBe('Component');
+      expect(Number(after[0].count)).toBe(1);
+
+      await migrateDownOnce(knex);
+
+      await knex.destroy();
+    },
+  );
 });

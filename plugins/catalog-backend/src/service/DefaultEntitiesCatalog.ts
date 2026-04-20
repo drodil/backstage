@@ -690,13 +690,17 @@ export class DefaultEntitiesCatalog implements EntitiesCatalog {
       .groupBy(['search.key', 'search.original_value']);
 
     if (request.filter || request.query) {
+      const entityIdQuery = this.database<DbFinalEntitiesRow>('final_entities')
+        .select('final_entities.entity_id')
+        .whereNotNull('final_entities.final_entity');
       applyEntityFilterToQuery({
         filter: request.filter,
         query: request.query,
-        targetQuery: query,
-        onEntityIdField: 'search.entity_id',
+        targetQuery: entityIdQuery,
+        onEntityIdField: 'final_entities.entity_id',
         knex: this.database,
       });
+      query.whereIn('search.entity_id', entityIdQuery);
     }
 
     const rows = await query;
