@@ -14,13 +14,18 @@
  * limitations under the License.
  */
 
-import { createBackendModule } from '@backstage/backend-plugin-api';
 import {
-  CatalogModelSources,
+  coreServices,
+  createBackendModule,
+} from '@backstage/backend-plugin-api';
+import {
   aiResourceEntityModel,
+  CatalogModelSources,
   mcpServerApiEntityModel,
 } from '@backstage/catalog-model/alpha';
 import { catalogModelExtensionPoint } from '@backstage/plugin-catalog-node/alpha';
+import { catalogServiceRef } from '@backstage/plugin-catalog-node';
+import { createSkillsRouter } from './SkillsRouter';
 
 /**
  * Registers support for the AiResource entity kind in the catalog.
@@ -34,14 +39,38 @@ export const catalogModuleAiResourceEntityModel = createBackendModule({
     reg.registerInit({
       deps: {
         model: catalogModelExtensionPoint,
+        rootHttpRouter: coreServices.rootHttpRouter,
+        catalog: catalogServiceRef,
+        auth: coreServices.auth,
+        reader: coreServices.urlReader,
+        cache: coreServices.cache,
+        logger: coreServices.logger,
       },
-      async init({ model }) {
+      async init({
+        model,
+        rootHttpRouter,
+        catalog,
+        auth,
+        reader,
+        cache,
+        logger,
+      }) {
         model.addModelSource(
           CatalogModelSources.static([
             aiResourceEntityModel,
             mcpServerApiEntityModel,
           ]),
         );
+
+        const skillsRouter = createSkillsRouter({
+          catalog,
+          auth,
+          reader,
+          cache,
+          logger,
+        });
+
+        rootHttpRouter.use('/.well-known/skills', skillsRouter);
       },
     });
   },
